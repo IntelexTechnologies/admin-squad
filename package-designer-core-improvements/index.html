@@ -6,86 +6,65 @@
 <title>PIE Package Designer Prototype</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
-
-<script src="https://unpkg.com/lucide@0.383.0/dist/umd/lucide.min.js"></script>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:13px;background:#eef1f5;color:#1e2d3d}
-  input,select,button{font-family:inherit;font-size:inherit}
-  ::-webkit-scrollbar{width:6px;height:6px}
-  ::-webkit-scrollbar-track{background:#e4ecf2}
-  ::-webkit-scrollbar-thumb{background:#b0c0ce;border-radius:3px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;font-size:13px;background:#eef1f5;color:#1e2d3d}
+input,select,button{font-family:inherit;font-size:inherit}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#e4ecf2}
+::-webkit-scrollbar-thumb{background:#b0c0ce;border-radius:3px}
 </style>
 </head>
 <body>
 <div id="root"></div>
-<script type="text/javascript">
-const { useState, createElement: h } = React;
+<script>
+var h = React.createElement;
+var useState = React.useState;
 
-// Icons from lucide UMD
-const Icon = ({ name, size=13, style={} }) => {
-  const el = lucide[name];
-  if (!el) return null;
-  const svg = lucide.createElement(el, { size, ...style });
-  return React.createElement('span', { style:{ display:'inline-flex', alignItems:'center', ...style } },
-    React.createElement('svg', { width:size, height:size, viewBox:'0 0 24 24', fill:'none', stroke:'currentColor', strokeWidth:2, strokeLinecap:'round', strokeLinejoin:'round', dangerouslySetInnerHTML:{ __html: getIconPaths(name) } })
-  );
+var C={brand:"#1a7ab5",brandDark:"#0f5a87",bg:"#eef1f5",surface:"#ffffff",foreground:"#1e2d3d",mutedFg:"#7a8fa0",border:"#d0dae5",muted:"#e4ecf2",accent:"#e8f3fb",warning:"#f5b400",warningFg:"#1e2d3d",success:"#2e9e5b",destructive:"#d63b3b",sidebarBg:"#243040",sidebarFg:"#b0c0ce",sidebarAccent:"#2e3d50",sidebarActiveBg:"#1a7ab5"};
+var TH={background:C.muted,color:C.mutedFg,fontSize:11,fontWeight:600,textTransform:"uppercase",letterSpacing:"0.05em",padding:"6px 10px",textAlign:"left",borderBottom:"1px solid "+C.border};
+var TD={padding:"6px 10px",borderBottom:"1px solid "+C.border,fontSize:13};
+var FI={width:"100%",border:"1px solid "+C.border,borderRadius:3,padding:"2px 5px",fontSize:11,background:C.surface,color:C.foreground,fontWeight:"normal"};
+var THS=Object.assign({},TH,{background:C.surface,padding:"3px 10px"});
+
+var PATHS={
+  Search:'<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>',
+  Star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  Clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  MapPin:'<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>',
+  Users:'<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>',
+  Shield:'<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>',
+  Globe:'<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>',
+  CheckSquare:'<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>',
+  Bell:'<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>',
+  Wrench:'<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>',
+  Home:'<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>',
+  Palette:'<circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>',
+  BookOpen:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  Rss:'<path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>',
+  Settings:'<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>',
+  Package:'<line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
+  List:'<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',
+  ChevronRight:'<polyline points="9 18 15 12 9 6"/>',
+  Pencil:'<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>',
+  RefreshCw:'<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>',
+  Upload:'<polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>',
+  Trash2:'<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>',
+  LogOut:'<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>',
+  Plus:'<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>',
+  Minus:'<line x1="5" y1="12" x2="19" y2="12"/>',
+  Settings2:'<path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/>',
+  AlertTriangle:'<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>',
+  CheckCircle2:'<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+  X:'<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>',
+  SlidersHorizontal:'<line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/>'
 };
 
-// Inline SVG paths for icons we need
-const ICON_PATHS = {
-  Search:`<circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>`,
-  Star:`<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>`,
-  Clock:`<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>`,
-  MapPin:`<path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>`,
-  Users:`<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>`,
-  Shield:`<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>`,
-  Globe:`<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>`,
-  CheckSquare:`<polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>`,
-  Bell:`<path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/>`,
-  Wrench:`<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>`,
-  Home:`<path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>`,
-  Palette:`<circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/>`,
-  BookOpen:`<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>`,
-  Rss:`<path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>`,
-  Settings:`<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>`,
-  Package:`<line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>`,
-  List:`<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>`,
-  ChevronRight:`<polyline points="9 18 15 12 9 6"/>`,
-  Pencil:`<path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/>`,
-  RefreshCw:`<polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>`,
-  Upload:`<polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>`,
-  Trash2:`<polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/>`,
-  LogOut:`<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>`,
-  Plus:`<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>`,
-  Minus:`<line x1="5" y1="12" x2="19" y2="12"/>`,
-  Settings2:`<path d="M20 7h-9"/><path d="M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/>`,
-  AlertTriangle:`<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>`,
-  CheckCircle2:`<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>`,
-  Info:`<circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>`,
-  X:`<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>`,
-  SlidersHorizontal:`<line x1="21" y1="4" x2="14" y2="4"/><line x1="10" y1="4" x2="3" y2="4"/><line x1="21" y1="12" x2="12" y2="12"/><line x1="8" y1="12" x2="3" y2="12"/><line x1="21" y1="20" x2="16" y2="20"/><line x1="12" y1="20" x2="3" y2="20"/><line x1="14" y1="2" x2="14" y2="6"/><line x1="8" y1="10" x2="8" y2="14"/><line x1="16" y1="18" x2="16" y2="22"/>`,
-};
-
-function getIconPaths(name){ return ICON_PATHS[name]||''; }
-
-function Ic({name,size=13,color,style={}}){
-  return React.createElement('svg',{width:size,height:size,viewBox:'0 0 24 24',fill:'none',stroke:color||'currentColor',strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round',style,dangerouslySetInnerHTML:{__html:getIconPaths(name)}});
+function Ic(props) {
+  return h('svg',{width:props.size||13,height:props.size||13,viewBox:'0 0 24 24',fill:'none',stroke:props.color||'currentColor',strokeWidth:2,strokeLinecap:'round',strokeLinejoin:'round',style:props.style||{},dangerouslySetInnerHTML:{__html:PATHS[props.name]||''}});
 }
 
-const C = {
-  brand:"#1a7ab5",brandDark:"#0f5a87",bg:"#eef1f5",surface:"#ffffff",
-  foreground:"#1e2d3d",mutedFg:"#7a8fa0",border:"#d0dae5",muted:"#e4ecf2",
-  accent:"#e8f3fb",accentFg:"#0f5a87",warning:"#f5b400",warningFg:"#1e2d3d",
-  success:"#2e9e5b",destructive:"#d63b3b",
-  sidebarBg:"#243040",sidebarFg:"#b0c0ce",sidebarAccent:"#2e3d50",sidebarActiveBg:"#1a7ab5",
-};
-
-const th={background:C.muted,color:C.mutedFg,fontSize:11,fontWeight:600,textTransform:'uppercase',letterSpacing:'0.05em',padding:'6px 10px',textAlign:'left',borderBottom:`1px solid ${C.border}`};
-const td={padding:'6px 10px',borderBottom:`1px solid ${C.border}`,fontSize:13};
-const fi={width:'100%',border:`1px solid ${C.border}`,borderRadius:3,padding:'2px 5px',fontSize:11,background:C.surface,color:C.foreground,fontWeight:'normal'};
-
-const NAV_ITEMS=[
+var NAV_ITEMS=[
   {icon:'Star',label:'Favorites',badge:'5'},{icon:'Clock',label:'Recent'},
   {icon:'MapPin',label:'Location Setup',hasChildren:true},{icon:'Users',label:'Employee Administration',hasChildren:true},
   {icon:'Shield',label:'User Administration',hasChildren:true},{icon:'Globe',label:'Localization',hasChildren:true},
@@ -94,50 +73,90 @@ const NAV_ITEMS=[
   {icon:'Palette',label:'Branding',hasChildren:true},{icon:'BookOpen',label:'Bulletin Settings',hasChildren:true},
   {icon:'Rss',label:'Feed Settings',hasChildren:true},{icon:'Settings',label:'Manage Toolbars'},
   {icon:'Package',label:'Package Installer'},{icon:'Package',label:'Package Designer',active:true},
-  {icon:'List',label:'Walkthrough List'},
+  {icon:'List',label:'Walkthrough List'}
 ];
 
-const TYPES_BEFORE=["Application","Dashboard","Data Import Templates","Events","Field","Mobile View","Object","Object Business Rules","Object data","Question set","Report","Right","Translation data","Translation Dictionary","UoM Category","View","Walkthrough","Workflow"];
-const TYPES_AFTER=["Application","Application Tab","Dashboard","Data Import Templates","Events","Field","Mobile View","Notification Template","Object","Object Action Handler","Object Business Rules","Object data","Question set","Report","Right","Translation data","Translation Dictionary","UoM Category","View","Walkthrough","Workflow"];
-const NEW_TYPES=["Application Tab","Notification Template","Object Action Handler"];
+var TYPES_BEFORE=["Application","Dashboard","Data Import Templates","Events","Field","Mobile View","Object","Object Business Rules","Object data","Question set","Report","Right","Translation data","Translation Dictionary","UoM Category","View","Walkthrough","Workflow"];
+var TYPES_AFTER=["Application","Application Tab","Dashboard","Data Import Templates","Events","Field","Mobile View","Notification Template","Object","Object Action Handler","Object Business Rules","Object data","Question set","Report","Right","Translation data","Translation Dictionary","UoM Category","View","Walkthrough","Workflow"];
+var TAB_TYPES=["Auto-generated Configurable View","Configurable View","Dashboard","Link","Report"];
 
-const ACTION_HANDLERS=[
-  {application:"EHS Incident Management",object:"Injury/Illness",name:"[Helper] OSHA Only",description:"",actions:"Create, Update"},
-  {application:"EHS Incident Management",object:"Injury/Illness",name:"[OH Integration] Prevent Employee Change when injury record is related to Case",description:"",actions:"Update"},
-  {application:"EHS Incident Management",object:"Injury/Illness",name:"[OH Integration] Set Relation with Occupational Health Record",description:"",actions:"Create, Update"},
-  {application:"EHS Incident Management",object:"Injury/Illness",name:"'Date of Fatality' must be on or after 'Date and Time of Incident'",description:"'Date of Fatality' must be on or after 'Date and Time of Incident'",actions:"Update"},
-  {application:"EHS Incident Management",object:"Injury/Illness",name:"Archive Injury/Illness",description:"",actions:"Archive"},
-  {application:"EHS Incident Management",object:"Injury/Illness",name:"Clear Medical Facility",description:"",actions:"Update"},
-  {application:"EHS Incident Management",object:"Injury/Illness",name:"Clear value of Worker Detail Section",description:"Clears fields in worker detail section based on Worker Type.",actions:"Create, Update"},
-  {application:"EHS Incident Management",object:"Injury/Illness",name:"Clear value of Validation Details Section",description:"Clears fields based on Is This a Valid Incident? selection.",actions:"Update"},
-  {application:"EHS Incident Management",object:"Injury/Illness",name:"Create OSHA Record",description:"Creates OSHA Record on First Transition of WF.",actions:"Create, Update"},
-  {application:"EHS Incident Management",object:"Injury/Illness",name:"'Date of Hire' must be before 'Date of Time of Incident'.",description:"'Date of Hire' must be before 'Date of Time of Incident'.",actions:"Update"},
+var ACTION_HANDLERS=[
+  {name:"[Helper] OSHA Only",description:"",actions:"Create, Update",isEnabled:"Yes"},
+  {name:"[OH Integration] Prevent Employee Change when injury record is related to Case",description:"",actions:"Update",isEnabled:"Yes"},
+  {name:"[OH Integration] Set Relation with Occupational Health Record",description:"",actions:"Create, Update",isEnabled:"Yes"},
+  {name:"'Date of Fatality' must be on or after 'Date and Time of Incident'",description:"'Date of Fatality' must be on or after 'Date and Time of Incident'",actions:"Update",isEnabled:"Yes"},
+  {name:"Archive Injury/Illness",description:"",actions:"Archive",isEnabled:"Yes"},
+  {name:"Clear Medical Facility",description:"",actions:"Update",isEnabled:"Yes"},
+  {name:"Clear value of Worker Detail Section",description:"Clears fields based on Worker Type.",actions:"Create, Update",isEnabled:"Yes"},
+  {name:"Clear value of Validation Details Section",description:"Clears fields based on Is This a Valid Incident?",actions:"Update",isEnabled:"Yes"},
+  {name:"Create OSHA Record",description:"Creates OSHA Record on First Transition of WF.",actions:"Create, Update",isEnabled:"Yes"},
+  {name:"'Date of Hire' must be before 'Date of Time of Incident'.",description:"'Date of Hire' must be before 'Date of Time of Incident'.",actions:"Update",isEnabled:"Yes"},
+  {name:"'Date of Treatment' Validation",description:"'Date of Treatment' must be after 'Date and Time of Incident'.",actions:"Update",isEnabled:"Yes"},
+  {name:"Investigation Due Date Validation",description:"Validates Investigation Due Date on Verification Stage.",actions:"Update",isEnabled:"Yes"},
+  {name:"Master Incident Action and Reopen Workflow Action",description:"Custom Action Handler for Master Incident and Reopening Workflow.",actions:"Update",isEnabled:"Yes"},
+  {name:"Populate Task Before Incident In Osha",description:"",actions:"Create, Update",isEnabled:"Yes"},
+  {name:"Set Name Hidden Field",description:"",actions:"Create, Update",isEnabled:"Yes"},
+  {name:"Set Name of Event Type Object",description:"Sets the value of name of event in Event type object.",actions:"Create",isEnabled:"Yes"},
+  {name:"Set Previous Stage PR and Due Date fields when workflow is Cancelled or Completed",description:"Sets previous stage person responsible and due date.",actions:"Update",isEnabled:"Yes"}
+];
+var ACTION_HANDLER_GROUPS=[{application:"EHS Incident Management",object:"Injury/Illness",total:17,items:ACTION_HANDLERS}];
+
+var APP_TAB_GROUPS=[
+  {application:"EHS Incident Management",total:11,items:[
+    {caption:"Incidents",systemName:"Incidents",tabType:"Configurable View"},
+    {caption:"Injury/Illness",systemName:"InjuryIllness",tabType:"Configurable View"},
+    {caption:"My Incidents",systemName:"MyIncidents",tabType:"Configurable View"},
+    {caption:"Near Miss",systemName:"NearMiss",tabType:"Configurable View"},
+    {caption:"Near Misses",systemName:"NearMisses",tabType:"Configurable View"},
+    {caption:"Property",systemName:"Property",tabType:"Configurable View"},
+    {caption:"Settings",systemName:"Settings",tabType:"Dashboard"},
+    {caption:"Vehicle",systemName:"Vehicle",tabType:"Configurable View"},
+    {caption:"WCB Forms",systemName:"WCBForms",tabType:"Configurable View"}
+  ]},
+  {application:"Emission Factor Library",total:3,items:[
+    {caption:"Emission Factor Values",systemName:"EmissionFactorValues",tabType:"Configurable View"},
+    {caption:"Emission Factor Categories",systemName:"EmissionFactorCategories",tabType:"Configurable View"},
+    {caption:"Emission Factors",systemName:"EmissionFactors",tabType:"Configurable View"}
+  ]},
+  {application:"Action Plans",total:5,items:[
+    {caption:"Action Plans",systemName:"ActionPlans",tabType:"Configurable View"},
+    {caption:"My Action Plans",systemName:"MyActionPlans",tabType:"Configurable View"},
+    {caption:"Overdue Action Plans",systemName:"OverdueActionPlans",tabType:"Configurable View"},
+    {caption:"Action Plan Templates",systemName:"ActionPlanTemplates",tabType:"Configurable View"},
+    {caption:"Action Plan Settings",systemName:"ActionPlanSettings",tabType:"Dashboard"}
+  ]},
+  {application:"Inspections",total:7,items:[
+    {caption:"Inspections",systemName:"Inspections",tabType:"Configurable View"},
+    {caption:"My Inspections",systemName:"MyInspections",tabType:"Configurable View"},
+    {caption:"Inspection Templates",systemName:"InspectionTemplates",tabType:"Configurable View"},
+    {caption:"Inspection Types",systemName:"InspectionTypes",tabType:"Configurable View"},
+    {caption:"Checklists",systemName:"Checklists",tabType:"Configurable View"},
+    {caption:"Inspection Settings",systemName:"InspectionSettings",tabType:"Dashboard"},
+    {caption:"Scheduled Inspections",systemName:"ScheduledInspections",tabType:"Configurable View"}
+  ]}
 ];
 
-const APP_TAB_GROUPS=[
-  {application:"EHS Incident Management",total:11,items:["Incidents","Injury/Illness","My Incidents","Near Miss","Near Misses","Property","Settings","Vehicle","WCB Forms"]},
-  {application:"Emission Factor Library",total:3,items:["Emission Factor Values","Emission Factor Categories","Emission Factors"]},
-  {application:"Action Plans",total:5,items:["Action Plans","My Action Plans","Overdue Action Plans","Action Plan Templates","Action Plan Settings"]},
-  {application:"Inspections",total:7,items:["Inspections","My Inspections","Inspection Templates","Inspection Types","Checklists","Inspection Settings","Scheduled Inspections"]},
+var NOTIF_GROUPS=[
+  {object:"Injury Claim",items:[{id:544,name:"Claim has been Canceled",application:"Claims Management"}]},
+  {object:"Injury/Illness",items:[
+    {id:442,name:"EHS - Injury/Illness has been verified.",application:"EHS Incident Management"},
+    {id:564,name:"EHS - [DEPRECATED] Injury/Illness submitted for Approval",application:"EHS Incident Management"},
+    {id:540,name:"Injury/Illness Activity is Overdue!",application:"EHS Incident Management"},
+    {id:443,name:"EHS - [DEPRECATED] Injury/Illness has been cancelled.",application:"EHS Incident Management"},
+    {id:444,name:"EHS - Injury/Illness has been investigated.",application:"EHS Incident Management"},
+    {id:445,name:"EHS - Injury/Illness returned for Investigation.",application:"EHS Incident Management"},
+    {id:446,name:"EHS - Injury/Illness has been closed.",application:"EHS Incident Management"},
+    {id:441,name:"EHS - Injury/Illness has been submitted.",application:"EHS Incident Management"},
+    {id:447,name:"EHS - Injury/Illness has been reopened.",application:"EHS Incident Management"}
+  ]},
+  {object:"Inspection",items:[
+    {id:608,name:"[Inspection] Completed",application:"Inspections"},
+    {id:607,name:"[Inspection] Sent to Action Pending stage",application:"Inspections"},
+    {id:605,name:"[Inspection] Sent to In Progress stage",application:"Inspections"}
+  ]}
 ];
 
-const NOTIF_TEMPLATES=[
-  {id:544,name:"Claim has been Canceled",object:"Injury Claim",application:"Claims Management"},
-  {id:442,name:"EHS - Injury/Illness has been verified.",object:"Injury/Illness",application:"EHS Incident Management"},
-  {id:564,name:"EHS - [DEPRECATED] Injury/Illness has been submitted for Approval",object:"Injury/Illness",application:"EHS Incident Management"},
-  {id:540,name:"Injury/Illness Activity is Overdue!",object:"Injury/Illness",application:"EHS Incident Management"},
-  {id:443,name:"EHS - [DEPRECATED] Injury/Illness has been cancelled.",object:"Injury/Illness",application:"EHS Incident Management"},
-  {id:444,name:"EHS - Injury/Illness has been investigated.",object:"Injury/Illness",application:"EHS Incident Management"},
-  {id:445,name:"EHS - Injury/Illness has been returned for Investigation.",object:"Injury/Illness",application:"EHS Incident Management"},
-  {id:446,name:"EHS - Injury/Illness has been closed.",object:"Injury/Illness",application:"EHS Incident Management"},
-  {id:441,name:"EHS - Injury/Illness has been submitted.",object:"Injury/Illness",application:"EHS Incident Management"},
-  {id:447,name:"EHS - Injury/Illness has been reopened.",object:"Injury/Illness",application:"EHS Incident Management"},
-  {id:608,name:"[Inspection] Completed",object:"Inspection",application:"Inspections"},
-  {id:607,name:"[Inspection] Sent to Action Pending stage",object:"Inspection",application:"Inspections"},
-  {id:605,name:"[Inspection] Sent to In Progress stage",object:"Inspection",application:"Inspections"},
-];
-
-const VIEW_DATA=[
+var VIEW_DATA=[
   {application:"3E Gateway",object:"3E Container Type",name:"Eee_EeeContainType_Detail",type:"Detail"},
   {application:"3E Gateway",object:"3E Container Type",name:"Eee_EeeContainType_Inventory",type:"Inventory"},
   {application:"3E Gateway",object:"3E Container Type Units",name:"Eee_ContaiTypeUnits_Detail",type:"Detail"},
@@ -154,489 +173,507 @@ const VIEW_DATA=[
   {application:"",object:"(empty)",name:"PowerTools_CustomInventory_Inventory",type:"Inventory"},
   {application:"",object:"(empty)",name:"PowerTools_EmailMessageTemplate_Inventory",type:"Inventory"},
   {application:"",object:"(empty)",name:"PowerTools_Field_Inventory",type:"Inventory"},
-  {application:"",object:"(empty)",name:"PowerTools_FieldBusinessRule_Inventory",type:"Inventory"},
+  {application:"",object:"(empty)",name:"PowerTools_FieldBusinessRule_Inventory",type:"Inventory"}
 ];
 
-function MBtn({onClick,disabled,primary,children}){
-  return React.createElement('button',{onClick,disabled,style:{display:'flex',alignItems:'center',gap:5,padding:'5px 14px',fontSize:12,fontWeight:600,borderRadius:4,cursor:disabled?'not-allowed':'pointer',border:`1px solid ${primary?C.brand:C.border}`,background:primary?C.brand:C.surface,color:primary?'#fff':C.brand,opacity:disabled?0.4:1}},children);
+function MBtn(props) {
+  return h('button',{onClick:props.onClick,disabled:props.disabled,style:{display:'flex',alignItems:'center',gap:5,padding:'5px 14px',fontSize:12,fontWeight:600,borderRadius:4,cursor:props.disabled?'not-allowed':'pointer',border:'1px solid '+(props.primary?C.brand:C.border),background:props.primary?C.brand:C.surface,color:props.primary?'#fff':C.brand,opacity:props.disabled?0.4:1}},props.children);
 }
 
-function ModalShell({title,width=860,onClose,children,footerLeft,footerRight}){
-  return React.createElement('div',{style:{position:'fixed',inset:0,zIndex:50,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,0.4)'}},
-    React.createElement('div',{style:{background:C.surface,borderRadius:6,boxShadow:'0 8px 32px rgba(0,0,0,0.22)',width,maxHeight:'85vh',display:'flex',flexDirection:'column',border:`1px solid ${C.border}`}},
-      React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 14px',background:C.brand,color:'#fff',borderRadius:'6px 6px 0 0',flexShrink:0}},
-        React.createElement('span',{style:{fontWeight:600,fontSize:13}},title),
-        React.createElement('button',{onClick:onClose,style:{background:'none',border:'none',color:'#fff',cursor:'pointer',display:'flex'}},React.createElement(Ic,{name:'X',size:15}))
+function ModalShell(props) {
+  return h('div',{style:{position:'fixed',inset:0,zIndex:50,display:'flex',alignItems:'center',justifyContent:'center',background:'rgba(0,0,0,0.4)'}},
+    h('div',{style:{background:C.surface,borderRadius:6,boxShadow:'0 8px 32px rgba(0,0,0,0.22)',width:props.width||860,maxHeight:'85vh',display:'flex',flexDirection:'column',border:'1px solid '+C.border}},
+      h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'8px 14px',background:C.brand,color:'#fff',borderRadius:'6px 6px 0 0',flexShrink:0}},
+        h('span',{style:{fontWeight:600,fontSize:13}},props.title),
+        h('button',{onClick:props.onClose,style:{background:'none',border:'none',color:'#fff',cursor:'pointer',display:'flex'}},h(Ic,{name:'X',size:15}))
       ),
-      React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'6px 14px',borderBottom:`1px solid ${C.border}`,background:C.muted,flexShrink:0}},
-        React.createElement('div',{style:{display:'flex',gap:12,fontSize:12,color:C.brand}},
-          [['List','List All'],['SlidersHorizontal','Advanced Search'],['Settings2','Actions']].map(([icon,label])=>
-            React.createElement('button',{key:label,style:{display:'flex',alignItems:'center',gap:4,background:'none',border:'none',color:C.brand,cursor:'pointer',fontSize:12,fontWeight:label==='List All'?600:400}},
-              React.createElement(Ic,{name:icon,size:12}),label
-            )
-          )
+      h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'6px 14px',borderBottom:'1px solid '+C.border,background:C.muted,flexShrink:0}},
+        h('div',{style:{display:'flex',gap:12}},
+          h('button',{style:{display:'flex',alignItems:'center',gap:4,background:'none',border:'none',color:C.brand,cursor:'pointer',fontSize:12,fontWeight:600}},h(Ic,{name:'List',size:12}),' List All'),
+          h('button',{style:{display:'flex',alignItems:'center',gap:4,background:'none',border:'none',color:C.brand,cursor:'pointer',fontSize:12}},h(Ic,{name:'SlidersHorizontal',size:12}),' Advanced Search'),
+          h('button',{style:{display:'flex',alignItems:'center',gap:4,background:'none',border:'none',color:C.brand,cursor:'pointer',fontSize:12}},h(Ic,{name:'Settings2',size:12}),' Actions')
         ),
-        React.createElement('select',{style:{fontSize:11,border:`1px solid ${C.border}`,borderRadius:3,padding:'2px 6px',background:C.surface}},
-          React.createElement('option',null,'Custom Inventory')
-        )
+        h('select',{style:{fontSize:11,border:'1px solid '+C.border,borderRadius:3,padding:'2px 6px',background:C.surface}},h('option',null,'Custom Inventory'))
       ),
-      React.createElement('div',{style:{flex:1,overflowY:'auto'}},children),
-      React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'7px 14px',borderTop:`1px solid ${C.border}`,background:C.muted,flexShrink:0}},
-        React.createElement('span',{style:{fontSize:11,color:C.mutedFg}},footerLeft),
-        React.createElement('div',{style:{display:'flex',gap:8}},footerRight)
+      h('div',{style:{flex:1,overflowY:'auto'}},props.children),
+      h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'7px 14px',borderTop:'1px solid '+C.border,background:C.muted,flexShrink:0}},
+        h('span',{style:{fontSize:11,color:C.mutedFg}},props.footerLeft),
+        h('div',{style:{display:'flex',gap:8}},props.footerRight)
       )
     )
   );
 }
 
-function ItemTypeModal({mode,onSelect,onClose}){
-  const [filter,setFilter]=useState('');
-  const [highlighted,setHighlighted]=useState(null);
-  const types=mode==='before'?TYPES_BEFORE:TYPES_AFTER;
-  const filtered=types.filter(t=>t.toLowerCase().includes(filter.toLowerCase()));
-  return React.createElement(ModalShell,{title:'Select the type of item to include:',width:560,onClose,
-    footerLeft:`1 – ${filtered.length} of ${filtered.length}`,
-    footerRight:[React.createElement(MBtn,{key:'c',onClick:onClose},'Cancel'),React.createElement(MBtn,{key:'s',primary:true,disabled:!highlighted,onClick:()=>highlighted&&onSelect(highlighted)},'Select')]},
-    React.createElement('div',{style:{padding:'8px 14px',borderBottom:`1px solid ${C.border}`}},
-      React.createElement('div',{style:{fontSize:11,fontWeight:600,color:C.mutedFg,marginBottom:4}},'Name'),
-      React.createElement('div',{style:{display:'flex',alignItems:'center',gap:6,border:`1px solid ${C.border}`,borderRadius:4,padding:'4px 8px'}},
-        React.createElement(Ic,{name:'Search',size:11,style:{color:C.mutedFg}}),
-        React.createElement('input',{value:filter,onChange:e=>setFilter(e.target.value),placeholder:'Filter by name...',style:{flex:1,border:'none',outline:'none',fontSize:12,background:'transparent'}})
-      )
+function GrpHdr(props) {
+  return h('tr',{style:{background:'#dce6ef',cursor:'pointer'},onClick:props.onToggle},
+    h('td',{style:Object.assign({},TD,{width:32}),onClick:function(e){e.stopPropagation();}},
+      h('input',{type:'checkbox',checked:props.checked,onChange:props.onCheck,style:{accentColor:C.brand}})
     ),
-    mode==='before'&&React.createElement('div',{style:{margin:'10px 14px 0',display:'flex',alignItems:'flex-start',gap:8,background:'rgba(214,59,59,0.08)',border:'1px solid rgba(214,59,59,0.3)',borderRadius:4,padding:'8px 10px'}},
-      React.createElement(Ic,{name:'AlertTriangle',size:13,color:C.destructive,style:{marginTop:1,flexShrink:0}}),
-      React.createElement('p',{style:{fontSize:11,color:C.foreground,lineHeight:1.5,margin:0}},
-        React.createElement('strong',null,'Customer Problem:'),' "Object Action Handler", "Application Tab", and "Notification Template" are ',React.createElement('strong',null,'not available'),' in this list.'
-      )
-    ),
-    mode==='after'&&React.createElement('div',{style:{margin:'10px 14px 0',display:'flex',alignItems:'flex-start',gap:8,background:'rgba(46,158,91,0.08)',border:'1px solid rgba(46,158,91,0.3)',borderRadius:4,padding:'8px 10px'}},
-      React.createElement(Ic,{name:'CheckCircle2',size:13,color:C.success,style:{marginTop:1,flexShrink:0}}),
-      React.createElement('p',{style:{fontSize:11,color:C.foreground,lineHeight:1.5,margin:0}},
-        React.createElement('strong',null,'Proposed Fix:'),' 3 new item types now available: Object Action Handler, Application Tab, Notification Template.'
-      )
-    ),
-    React.createElement('table',{style:{width:'100%',borderCollapse:'collapse',marginTop:8}},
-      React.createElement('tbody',null,
-        filtered.map(type=>{
-          const isNew=NEW_TYPES.includes(type)&&mode==='after';
-          const isSel=highlighted===type;
-          return React.createElement('tr',{key:type,onClick:()=>setHighlighted(type),style:{cursor:'pointer',background:isSel?C.accent:isNew?'rgba(46,158,91,0.06)':'transparent'}},
-            React.createElement('td',{style:{...td,width:32}},React.createElement('input',{type:'checkbox',readOnly:true,checked:isSel,style:{accentColor:C.brand}})),
-            React.createElement('td',{style:{...td,fontWeight:isNew?700:400,color:isNew?C.brand:C.foreground}},
-              type,
-              isNew&&React.createElement('span',{style:{marginLeft:8,background:C.success,color:'#fff',fontSize:10,padding:'1px 6px',borderRadius:3,fontWeight:700,textTransform:'uppercase'}},'New')
-            )
-          );
-        })
-      )
+    h('td',{colSpan:props.colSpan,style:Object.assign({},TD,{fontWeight:600,fontSize:12})},
+      h('span',{style:{marginRight:6,color:C.mutedFg}},props.isCollapsed?'▶':'▼'),
+      props.prefix+': ',h('strong',null,props.name),' ',h('span',{style:{color:C.mutedFg,fontWeight:400}},props.count)
     )
   );
 }
 
-function ActionHandlerModal({onSelect,onClose}){
-  const [nameF,setNameF]=useState('');
-  const [actF,setActF]=useState('');
-  const [sel,setSel]=useState([]);
-  const filtered=ACTION_HANDLERS.filter(h=>h.name.toLowerCase().includes(nameF.toLowerCase())&&h.actions.toLowerCase().includes(actF.toLowerCase()));
-  const toggle=n=>setSel(p=>p.includes(n)?p.filter(x=>x!==n):[...p,n]);
-  const allChk=sel.length===filtered.length&&filtered.length>0;
-  return React.createElement(ModalShell,{title:'Select action handler(s) to include into the package …',width:920,onClose,
-    footerLeft:`1 – ${filtered.length} of ${ACTION_HANDLERS.length}`,
-    footerRight:[React.createElement(MBtn,{key:'c',onClick:onClose},'Cancel'),React.createElement(MBtn,{key:'s',primary:true,disabled:sel.length===0,onClick:()=>onSelect(ACTION_HANDLERS.filter(h=>sel.includes(h.name)))},`Select (${sel.length})`)]},
-    React.createElement('table',{style:{width:'100%',borderCollapse:'collapse'}},
-      React.createElement('thead',{style:{position:'sticky',top:0,zIndex:1}},
-        React.createElement('tr',null,
-          React.createElement('th',{style:{...th,width:32}},React.createElement('input',{type:'checkbox',checked:allChk,onChange:()=>setSel(allChk?[]:filtered.map(h=>h.name)),style:{accentColor:C.brand}})),
-          React.createElement('th',{style:{...th,width:28}}),
-          ['Application','Object','Name','Description','Actions'].map(h=>React.createElement('th',{key:h,style:th},h))
-        ),
-        React.createElement('tr',{style:{background:C.surface}},
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}}),
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}}),
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}}),
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}}),
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}},React.createElement('input',{value:nameF,onChange:e=>setNameF(e.target.value),style:fi,placeholder:'filter…'})),
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}}),
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}},
-            React.createElement('select',{value:actF,onChange:e=>setActF(e.target.value),style:fi},
-              React.createElement('option',{value:''},'All'),
-              ['Create','Update','Archive'].map(o=>React.createElement('option',{key:o},o))
-            )
-          )
-        )
-      ),
-      React.createElement('tbody',null,
-        filtered.map(h=>{
-          const isSel=sel.includes(h.name);
-          return React.createElement('tr',{key:h.name,onClick:()=>toggle(h.name),style:{cursor:'pointer',background:isSel?C.accent:'transparent'}},
-            React.createElement('td',{style:{...td,width:32},onClick:e=>e.stopPropagation()},React.createElement('input',{type:'checkbox',checked:isSel,onChange:()=>toggle(h.name),style:{accentColor:C.brand}})),
-            React.createElement('td',{style:{...td,width:28}},React.createElement(Ic,{name:'Pencil',size:11,color:C.brand})),
-            React.createElement('td',{style:{...td,color:C.brand,fontSize:12}},h.application),
-            React.createElement('td',{style:{...td,color:C.brand,fontSize:12}},h.object),
-            React.createElement('td',{style:{...td,color:C.brand,fontWeight:500,fontSize:12}},h.name),
-            React.createElement('td',{style:{...td,color:C.mutedFg,fontSize:11}},h.description),
-            React.createElement('td',{style:{...td,fontSize:12}},h.actions)
-          );
-        })
+function filterInput(val, setVal) {
+  return h('input',{value:val,onChange:function(e){setVal(e.target.value);},style:FI,placeholder:'filter...'});
+}
+
+function Sidebar() {
+  var state = useState('');
+  var search = state[0]; var setSearch = state[1];
+  var filtered = NAV_ITEMS.filter(function(i){return i.label.toLowerCase().indexOf(search.toLowerCase())>=0;});
+  return h('aside',{style:{width:220,flexShrink:0,background:C.sidebarBg,color:C.sidebarFg,display:'flex',flexDirection:'column',height:'100%',overflow:'hidden'}},
+    h('div',{style:{padding:8,borderBottom:'1px solid '+C.sidebarAccent}},
+      h('div',{style:{display:'flex',alignItems:'center',gap:6,background:C.sidebarAccent,borderRadius:4,padding:'5px 8px'}},
+        h(Ic,{name:'Search',size:12,style:{opacity:0.6}}),
+        h('input',{value:search,onChange:function(e){setSearch(e.target.value);},placeholder:'Search',style:{background:'transparent',border:'none',outline:'none',color:C.sidebarFg,fontSize:12,width:'100%'}})
       )
+    ),
+    h('nav',{style:{flex:1,overflowY:'auto',paddingTop:4}},
+      filtered.map(function(item){
+        return h('div',{key:item.label,style:{display:'flex',alignItems:'center',gap:8,padding:'6px 12px',cursor:'pointer',fontSize:12,background:item.active?C.sidebarActiveBg:'transparent',color:item.active?'#fff':C.sidebarFg,fontWeight:item.active?600:400}},
+          h(Ic,{name:item.icon,size:12,style:{flexShrink:0}}),
+          h('span',{style:{flex:1}},item.label),
+          item.badge?h('span',{style:{background:C.brand,color:'#fff',fontSize:10,borderRadius:99,padding:'1px 6px'}},item.badge):null,
+          item.hasChildren?h(Ic,{name:'ChevronRight',size:10,style:{opacity:0.5}}):null
+        );
+      })
     )
   );
 }
 
-function ApplicationTabModal({onSelect,onClose}){
-  const [capF,setCapF]=useState('');
-  const [appF,setAppF]=useState('');
-  const [sel,setSel]=useState([]);
-  const [collapsed,setCollapsed]=useState([]);
-  const toggleGroup=app=>setCollapsed(p=>p.includes(app)?p.filter(x=>x!==app):[...p,app]);
-  const toggle=key=>setSel(p=>p.includes(key)?p.filter(x=>x!==key):[...p,key]);
-  const toggleGroupSel=(items,app)=>{
-    const keys=items.map(i=>`${app}::${i}`);
-    const allIn=keys.every(k=>sel.includes(k));
-    setSel(p=>allIn?p.filter(k=>!keys.includes(k)):[...new Set([...p,...keys])]);
-  };
-  const filteredGroups=APP_TAB_GROUPS
-    .filter(g=>!appF||g.application.toLowerCase().includes(appF.toLowerCase()))
-    .map(g=>({...g,items:g.items.filter(i=>!capF||i.toLowerCase().includes(capF.toLowerCase()))}))
-    .filter(g=>g.items.length>0);
-  const total=filteredGroups.reduce((s,g)=>s+g.items.length,0);
-  const rows=[];
-  filteredGroups.forEach(g=>{
-    const groupKeys=g.items.map(i=>`${g.application}::${i}`);
-    const allGroupSel=groupKeys.every(k=>sel.includes(k));
-    const isCollapsed=collapsed.includes(g.application);
-    rows.push(React.createElement('tr',{key:`grp-${g.application}`,style:{background:'#dce6ef',cursor:'pointer'},onClick:()=>toggleGroup(g.application)},
-      React.createElement('td',{style:{...td,width:32},onClick:e=>e.stopPropagation()},React.createElement('input',{type:'checkbox',checked:allGroupSel,onChange:()=>toggleGroupSel(g.items,g.application),style:{accentColor:C.brand}})),
-      React.createElement('td',{colSpan:3,style:{...td,fontWeight:600,fontSize:12}},
-        React.createElement('span',{style:{marginRight:6,color:C.mutedFg}},isCollapsed?'▶':'▼'),
-        'Application: ',React.createElement('strong',null,g.application),' ',
-        React.createElement('span',{style:{color:C.mutedFg,fontWeight:400}},`(${g.items.length} of ${g.total})`)
+function ItemTypeModal(props) {
+  var s1=useState(''); var filter=s1[0]; var setFilter=s1[1];
+  var s2=useState(null); var hl=s2[0]; var setHl=s2[1];
+  var types=props.mode==='before'?TYPES_BEFORE:TYPES_AFTER;
+  var filtered=types.filter(function(t){return t.toLowerCase().indexOf(filter.toLowerCase())>=0;});
+  return h(ModalShell,{title:'Select the type of item to include:',width:560,onClose:props.onClose,
+    footerLeft:'1 - '+filtered.length+' of '+filtered.length,
+    footerRight:[h(MBtn,{key:'c',onClick:props.onClose},'Cancel'),h(MBtn,{key:'s',primary:true,disabled:!hl,onClick:function(){if(hl)props.onSelect(hl);}},'Select')]},
+    h('div',{style:{padding:'8px 14px',borderBottom:'1px solid '+C.border}},
+      h('div',{style:{fontSize:11,fontWeight:600,color:C.mutedFg,marginBottom:4}},'Name'),
+      h('div',{style:{display:'flex',alignItems:'center',gap:6,border:'1px solid '+C.border,borderRadius:4,padding:'4px 8px'}},
+        h(Ic,{name:'Search',size:11,style:{color:C.mutedFg}}),
+        h('input',{value:filter,onChange:function(e){setFilter(e.target.value);},placeholder:'Filter by name...',style:{flex:1,border:'none',outline:'none',fontSize:12,background:'transparent'}})
       )
-    ));
+    ),
+    props.mode==='before'?h('div',{style:{margin:'10px 14px 0',display:'flex',alignItems:'flex-start',gap:8,background:'rgba(214,59,59,0.08)',border:'1px solid rgba(214,59,59,0.3)',borderRadius:4,padding:'8px 10px'}},
+      h(Ic,{name:'AlertTriangle',size:13,color:C.destructive,style:{marginTop:1,flexShrink:0}}),
+      h('p',{style:{fontSize:11,color:C.foreground,lineHeight:1.5,margin:0}},
+        h('strong',null,'Customer Problem:'),' "Object Action Handler", "Application Tab", and "Notification Template" are ',h('strong',null,'not available'),' in this list.'
+      )
+    ):null,
+    h('table',{style:{width:'100%',borderCollapse:'collapse',marginTop:8}},
+      h('tbody',null,filtered.map(function(type){
+        var isSel=hl===type;
+        return h('tr',{key:type,onClick:function(){setHl(type);},style:{cursor:'pointer',background:isSel?C.accent:'transparent'}},
+          h('td',{style:Object.assign({},TD,{width:32})},h('input',{type:'checkbox',readOnly:true,checked:isSel,style:{accentColor:C.brand}})),
+          h('td',{style:TD},type)
+        );
+      }))
+    )
+  );
+}
+
+function ActionHandlerModal(props) {
+  var s1=useState('');var nameF=s1[0];var setNameF=s1[1];
+  var s2=useState('');var descF=s2[0];var setDescF=s2[1];
+  var s3=useState('');var actF=s3[0];var setActF=s3[1];
+  var s4=useState('');var enF=s4[0];var setEnF=s4[1];
+  var s5=useState('');var objF=s5[0];var setObjF=s5[1];
+  var s6=useState('');var appF=s6[0];var setAppF=s6[1];
+  var s7=useState([]);var sel=s7[0];var setSel=s7[1];
+  var s8=useState([]);var collapsed=s8[0];var setCollapsed=s8[1];
+
+  function toggleCollapse(obj){setCollapsed(function(p){return p.indexOf(obj)>=0?p.filter(function(x){return x!==obj;}):p.concat([obj]);});}
+  function toggle(n){setSel(function(p){return p.indexOf(n)>=0?p.filter(function(x){return x!==n;}):p.concat([n]);});}
+  function toggleGrp(items){
+    var names=items.map(function(i){return i.name;});
+    var allIn=names.every(function(n){return sel.indexOf(n)>=0;});
+    if(allIn){setSel(function(p){return p.filter(function(n){return names.indexOf(n)<0;});});}
+    else{setSel(function(p){var r=p.slice();names.forEach(function(n){if(r.indexOf(n)<0)r.push(n);});return r;});}
+  }
+
+  var filteredGroups=ACTION_HANDLER_GROUPS.filter(function(g){
+    return(!appF||g.application.toLowerCase().indexOf(appF.toLowerCase())>=0)&&(!objF||g.object.toLowerCase().indexOf(objF.toLowerCase())>=0);
+  }).map(function(g){
+    return {application:g.application,object:g.object,total:g.total,items:g.items.filter(function(h){
+      return h.name.toLowerCase().indexOf(nameF.toLowerCase())>=0&&h.description.toLowerCase().indexOf(descF.toLowerCase())>=0&&h.actions.toLowerCase().indexOf(actF.toLowerCase())>=0&&(!enF||h.isEnabled===enF);
+    })};
+  }).filter(function(g){return g.items.length>0;});
+
+  var total=filteredGroups.reduce(function(s,g){return s+g.items.length;},0);
+  var allNames=[];filteredGroups.forEach(function(g){g.items.forEach(function(i){allNames.push(i.name);});});
+  var allChk=allNames.length>0&&allNames.every(function(n){return sel.indexOf(n)>=0;});
+
+  var rows=[];
+  filteredGroups.forEach(function(g){
+    var isCollapsed=collapsed.indexOf(g.object)>=0;
+    var allGrpSel=g.items.every(function(i){return sel.indexOf(i.name)>=0;});
+    rows.push(h(GrpHdr,{key:'grp-'+g.object,checked:allGrpSel,onCheck:function(){toggleGrp(g.items);},colSpan:7,isCollapsed:isCollapsed,onToggle:function(){toggleCollapse(g.object);},prefix:'Object',name:g.object,count:'('+g.items.length+' of '+g.total+')'}));
     if(!isCollapsed){
-      g.items.forEach(item=>{
-        const key=`${g.application}::${item}`;
-        const isSel=sel.includes(key);
-        rows.push(React.createElement('tr',{key,onClick:()=>toggle(key),style:{cursor:'pointer',background:isSel?C.accent:'transparent'}},
-          React.createElement('td',{style:{...td,width:32,paddingLeft:20},onClick:e=>e.stopPropagation()},React.createElement('input',{type:'checkbox',checked:isSel,onChange:()=>toggle(key),style:{accentColor:C.brand}})),
-          React.createElement('td',{style:{...td,width:28,paddingLeft:20}},React.createElement(Ic,{name:'Pencil',size:11,color:C.brand})),
-          React.createElement('td',{style:{...td,color:C.brand,fontWeight:500}},item),
-          React.createElement('td',{style:{...td,fontSize:12}},g.application)
+      g.items.forEach(function(hi){
+        var isSel=sel.indexOf(hi.name)>=0;
+        rows.push(h('tr',{key:hi.name,onClick:function(){toggle(hi.name);},style:{cursor:'pointer',background:isSel?C.accent:'transparent'}},
+          h('td',{style:Object.assign({},TD,{width:32,paddingLeft:20}),onClick:function(e){e.stopPropagation();}},h('input',{type:'checkbox',checked:isSel,onChange:function(){toggle(hi.name);},style:{accentColor:C.brand}})),
+          h('td',{style:Object.assign({},TD,{width:28,paddingLeft:20})},h(Ic,{name:'Pencil',size:11,color:C.brand})),
+          h('td',{style:Object.assign({},TD,{color:C.brand,fontSize:12})},g.application),
+          h('td',{style:Object.assign({},TD,{color:C.brand,fontSize:12})},g.object),
+          h('td',{style:Object.assign({},TD,{color:C.brand,fontSize:12,cursor:'pointer'})},hi.name),
+          h('td',{style:Object.assign({},TD,{color:C.mutedFg,fontSize:11})},hi.description),
+          h('td',{style:Object.assign({},TD,{fontSize:12})},hi.actions),
+          h('td',{style:Object.assign({},TD,{fontSize:12})},hi.isEnabled)
         ));
       });
     }
   });
-  return React.createElement(ModalShell,{title:'Select application tab(s) to include into the package …',width:820,onClose,
-    footerLeft:`1 – ${total} of ${total}`,
-    footerRight:[React.createElement(MBtn,{key:'c',onClick:onClose},'Cancel'),React.createElement(MBtn,{key:'s',primary:true,disabled:sel.length===0,onClick:()=>{const items=sel.map(k=>{const[app,...rest]=k.split('::');return{caption:rest.join('::'),application:app};});onSelect(items);}},`Select (${sel.length})`)]},
-    React.createElement('table',{style:{width:'100%',borderCollapse:'collapse'}},
-      React.createElement('thead',{style:{position:'sticky',top:0,zIndex:1}},
-        React.createElement('tr',null,
-          React.createElement('th',{style:{...th,width:32}}),
-          React.createElement('th',{style:{...th,width:28}}),
-          React.createElement('th',{style:th},'Caption'),
-          React.createElement('th',{style:th},'Application')
+
+  return h(ModalShell,{title:'Select action handler(s) to include into the package',width:1020,onClose:props.onClose,
+    footerLeft:'1 - '+total+' of '+ACTION_HANDLERS.length,
+    footerRight:[h(MBtn,{key:'c',onClick:props.onClose},'Cancel'),h(MBtn,{key:'s',primary:true,disabled:sel.length===0,onClick:function(){props.onSelect(ACTION_HANDLERS.filter(function(hi){return sel.indexOf(hi.name)>=0;}));}},'Select')]},
+    h('table',{style:{width:'100%',borderCollapse:'collapse'}},
+      h('thead',{style:{position:'sticky',top:0,zIndex:1}},
+        h('tr',null,
+          h('th',{style:Object.assign({},TH,{width:32})},h('input',{type:'checkbox',checked:allChk,onChange:function(){if(allChk)setSel([]);else setSel(allNames.slice());},style:{accentColor:C.brand}})),
+          h('th',{style:Object.assign({},TH,{width:28})}),
+          h('th',{style:TH},'Application'),h('th',{style:TH},'Object'),h('th',{style:TH},'Name'),h('th',{style:TH},'Description'),h('th',{style:TH},'Actions'),h('th',{style:TH},'Is Enabled')
         ),
-        React.createElement('tr',{style:{background:C.surface}},
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}}),
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}}),
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}},React.createElement('input',{value:capF,onChange:e=>setCapF(e.target.value),style:fi,placeholder:'filter…'})),
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}},React.createElement('input',{value:appF,onChange:e=>setAppF(e.target.value),style:fi,placeholder:'filter…'}))
+        h('tr',{style:{background:C.surface}},
+          h('th',{style:THS}),h('th',{style:THS}),
+          h('th',{style:THS},filterInput(appF,setAppF)),
+          h('th',{style:THS},filterInput(objF,setObjF)),
+          h('th',{style:THS},filterInput(nameF,setNameF)),
+          h('th',{style:THS},filterInput(descF,setDescF)),
+          h('th',{style:THS},h('select',{value:actF,onChange:function(e){setActF(e.target.value);},style:FI},h('option',{value:''},'All'),h('option',null,'Create'),h('option',null,'Update'),h('option',null,'Archive'))),
+          h('th',{style:THS},h('select',{value:enF,onChange:function(e){setEnF(e.target.value);},style:FI},h('option',{value:''},'All'),h('option',null,'Yes'),h('option',null,'No')))
         )
       ),
-      React.createElement('tbody',null,...rows)
+      h.apply(null,['tbody',null].concat(rows))
     )
   );
 }
 
-function NotificationTemplateModal({onSelect,onClose}){
-  const [f,setF]=useState({id:'',name:'',object:'',application:''});
-  const [sel,setSel]=useState([]);
-  const upd=(k,v)=>setF(p=>({...p,[k]:v}));
-  const filtered=NOTIF_TEMPLATES.filter(t=>String(t.id).includes(f.id)&&t.name.toLowerCase().includes(f.name.toLowerCase())&&t.object.toLowerCase().includes(f.object.toLowerCase())&&t.application.toLowerCase().includes(f.application.toLowerCase()));
-  const toggle=id=>setSel(p=>p.includes(id)?p.filter(x=>x!==id):[...p,id]);
-  const allChk=sel.length===filtered.length&&filtered.length>0;
-  return React.createElement(ModalShell,{title:'Select notification template(s) to include into the package …',width:920,onClose,
-    footerLeft:`1 – ${filtered.length} of ${NOTIF_TEMPLATES.length}`,
-    footerRight:[React.createElement(MBtn,{key:'c',onClick:onClose},'Cancel'),React.createElement(MBtn,{key:'s',primary:true,disabled:sel.length===0,onClick:()=>onSelect(NOTIF_TEMPLATES.filter(t=>sel.includes(t.id)))},`Select (${sel.length})`)]},
-    React.createElement('table',{style:{width:'100%',borderCollapse:'collapse'}},
-      React.createElement('thead',{style:{position:'sticky',top:0,zIndex:1}},
-        React.createElement('tr',null,
-          React.createElement('th',{style:{...th,width:32}},React.createElement('input',{type:'checkbox',checked:allChk,onChange:()=>setSel(allChk?[]:filtered.map(t=>t.id)),style:{accentColor:C.brand}})),
-          React.createElement('th',{style:{...th,width:28}}),
-          ['Template #','Name','Object','Application'].map(h=>React.createElement('th',{key:h,style:th},h))
-        ),
-        React.createElement('tr',{style:{background:C.surface}},
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}}),
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}}),
-          ['id','name','object','application'].map(k=>React.createElement('th',{key:k,style:{...th,background:C.surface,padding:'3px 10px'}},React.createElement('input',{value:f[k],onChange:e=>upd(k,e.target.value),style:fi,placeholder:'filter…'})))
+function ApplicationTabModal(props) {
+  var s1=useState('');var capF=s1[0];var setCapF=s1[1];
+  var s2=useState('');var appF=s2[0];var setAppF=s2[1];
+  var s3=useState('');var sysF=s3[0];var setSysF=s3[1];
+  var s4=useState('');var typeF=s4[0];var setTypeF=s4[1];
+  var s5=useState([]);var sel=s5[0];var setSel=s5[1];
+  var s6=useState([]);var collapsed=s6[0];var setCollapsed=s6[1];
+
+  function toggleCollapse(app){setCollapsed(function(p){return p.indexOf(app)>=0?p.filter(function(x){return x!==app;}):p.concat([app]);});}
+  function toggle(key){setSel(function(p){return p.indexOf(key)>=0?p.filter(function(x){return x!==key;}):p.concat([key]);});}
+  function toggleGrp(items,app){
+    var keys=items.map(function(i){return app+'::'+i.caption;});
+    var allIn=keys.every(function(k){return sel.indexOf(k)>=0;});
+    if(allIn){setSel(function(p){return p.filter(function(k){return keys.indexOf(k)<0;});});}
+    else{setSel(function(p){var r=p.slice();keys.forEach(function(k){if(r.indexOf(k)<0)r.push(k);});return r;});}
+  }
+
+  var filteredGroups=APP_TAB_GROUPS.filter(function(g){return !appF||g.application.toLowerCase().indexOf(appF.toLowerCase())>=0;}).map(function(g){
+    return {application:g.application,total:g.total,items:g.items.filter(function(i){return(!capF||i.caption.toLowerCase().indexOf(capF.toLowerCase())>=0)&&(!sysF||i.systemName.toLowerCase().indexOf(sysF.toLowerCase())>=0)&&(!typeF||i.tabType===typeF);})};
+  }).filter(function(g){return g.items.length>0;});
+
+  var total=filteredGroups.reduce(function(s,g){return s+g.items.length;},0);
+  var rows=[];
+  filteredGroups.forEach(function(g){
+    var keys=g.items.map(function(i){return g.application+'::'+i.caption;});
+    var allGrpSel=keys.every(function(k){return sel.indexOf(k)>=0;});
+    var isCollapsed=collapsed.indexOf(g.application)>=0;
+    rows.push(h(GrpHdr,{key:'grp-'+g.application,checked:allGrpSel,onCheck:function(){toggleGrp(g.items,g.application);},colSpan:5,isCollapsed:isCollapsed,onToggle:function(){toggleCollapse(g.application);},prefix:'Application',name:g.application,count:'('+g.items.length+' of '+g.total+')'}));
+    if(!isCollapsed){
+      g.items.forEach(function(item){
+        var key=g.application+'::'+item.caption;
+        var isSel=sel.indexOf(key)>=0;
+        rows.push(h('tr',{key:key,onClick:function(){toggle(key);},style:{cursor:'pointer',background:isSel?C.accent:'transparent'}},
+          h('td',{style:Object.assign({},TD,{width:32,paddingLeft:20}),onClick:function(e){e.stopPropagation();}},h('input',{type:'checkbox',checked:isSel,onChange:function(){toggle(key);},style:{accentColor:C.brand}})),
+          h('td',{style:Object.assign({},TD,{width:28,paddingLeft:20})},h(Ic,{name:'Pencil',size:11,color:C.brand})),
+          h('td',{style:Object.assign({},TD,{color:C.brand,fontWeight:500})},g.application),
+          h('td',{style:Object.assign({},TD,{color:C.brand,fontWeight:500})},item.caption),
+          h('td',{style:Object.assign({},TD,{fontSize:12})},item.systemName),
+          h('td',{style:Object.assign({},TD,{fontSize:12})},item.tabType)
+        ));
+      });
+    }
+  });
+
+  return h(ModalShell,{title:'Select application tab(s) to include into the package',width:920,onClose:props.onClose,
+    footerLeft:'1 - '+total+' of '+total,
+    footerRight:[h(MBtn,{key:'c',onClick:props.onClose},'Cancel'),h(MBtn,{key:'s',primary:true,disabled:sel.length===0,onClick:function(){
+      var items=sel.map(function(k){var idx=k.indexOf('::');var app=k.slice(0,idx);var cap=k.slice(idx+2);var grp=APP_TAB_GROUPS.filter(function(g){return g.application===app;})[0];var item=grp?grp.items.filter(function(i){return i.caption===cap;})[0]:null;return{caption:cap,application:app,systemName:item?item.systemName:'',tabType:item?item.tabType:''};});
+      props.onSelect(items);
+    }},'Select')]},
+    h('table',{style:{width:'100%',borderCollapse:'collapse'}},
+      h('thead',{style:{position:'sticky',top:0,zIndex:1}},
+        h('tr',null,h('th',{style:Object.assign({},TH,{width:32})}),h('th',{style:Object.assign({},TH,{width:28})}),h('th',{style:TH},'Application'),h('th',{style:TH},'Caption'),h('th',{style:TH},'System Name'),h('th',{style:TH},'Tab Type')),
+        h('tr',{style:{background:C.surface}},
+          h('th',{style:THS}),h('th',{style:THS}),
+          h('th',{style:THS},filterInput(appF,setAppF)),
+          h('th',{style:THS},filterInput(capF,setCapF)),
+          h('th',{style:THS},filterInput(sysF,setSysF)),
+          h('th',{style:THS},h('select',{value:typeF,onChange:function(e){setTypeF(e.target.value);},style:FI},h('option',{value:''},'All'),TAB_TYPES.map(function(t){return h('option',{key:t},t);})))
         )
       ),
-      React.createElement('tbody',null,
-        filtered.map(t=>{
-          const isSel=sel.includes(t.id);
-          return React.createElement('tr',{key:t.id,onClick:()=>toggle(t.id),style:{cursor:'pointer',background:isSel?C.accent:'transparent'}},
-            React.createElement('td',{style:{...td,width:32},onClick:e=>e.stopPropagation()},React.createElement('input',{type:'checkbox',checked:isSel,onChange:()=>toggle(t.id),style:{accentColor:C.brand}})),
-            React.createElement('td',{style:{...td,width:28}},React.createElement(Ic,{name:'Pencil',size:11,color:C.brand})),
-            React.createElement('td',{style:{...td,color:C.brand,fontSize:12}},t.id),
-            React.createElement('td',{style:{...td,color:C.brand,fontSize:12}},t.name),
-            React.createElement('td',{style:{...td,color:C.brand,fontSize:12}},t.object),
-            React.createElement('td',{style:{...td,color:C.brand,fontSize:12}},t.application)
-          );
-        })
-      )
+      h.apply(null,['tbody',null].concat(rows))
     )
   );
 }
 
-function ViewModal({onSelect,onClose}){
-  const [f,setF]=useState({application:'',object:'',name:'',type:''});
-  const [sel,setSel]=useState([]);
-  const upd=(k,v)=>setF(p=>({...p,[k]:v}));
-  const filtered=VIEW_DATA.filter(v=>v.application.toLowerCase().includes(f.application.toLowerCase())&&v.object.toLowerCase().includes(f.object.toLowerCase())&&v.name.toLowerCase().includes(f.name.toLowerCase())&&(!f.type||v.type===f.type));
-  const toggle=n=>setSel(p=>p.includes(n)?p.filter(x=>x!==n):[...p,n]);
-  const allChk=sel.length===filtered.length&&filtered.length>0;
-  return React.createElement(ModalShell,{title:'Select the view(s) to include into the package …',width:980,onClose,
-    footerLeft:`1 – ${filtered.length} of ${VIEW_DATA.length}`,
-    footerRight:[React.createElement(MBtn,{key:'c',onClick:onClose},'Cancel'),React.createElement(MBtn,{key:'s',primary:true,disabled:sel.length===0,onClick:()=>onSelect(VIEW_DATA.filter(v=>sel.includes(v.name)))},`Select (${sel.length})`)]},
-    React.createElement('table',{style:{width:'100%',borderCollapse:'collapse'}},
-      React.createElement('thead',{style:{position:'sticky',top:0,zIndex:1}},
-        React.createElement('tr',null,
-          React.createElement('th',{style:{...th,width:32}},React.createElement('input',{type:'checkbox',checked:allChk,onChange:()=>setSel(allChk?[]:filtered.map(v=>v.name)),style:{accentColor:C.brand}})),
-          React.createElement('th',{style:{...th,width:28}}),
-          ['Application','Object','Name','Type'].map(h=>React.createElement('th',{key:h,style:th},h))
+function NotificationTemplateModal(props) {
+  var s1=useState('');var idF=s1[0];var setIdF=s1[1];
+  var s2=useState('');var nameF=s2[0];var setNameF=s2[1];
+  var s3=useState('');var objF=s3[0];var setObjF=s3[1];
+  var s4=useState('');var appF=s4[0];var setAppF=s4[1];
+  var s5=useState([]);var sel=s5[0];var setSel=s5[1];
+  var s6=useState([]);var collapsed=s6[0];var setCollapsed=s6[1];
+
+  function toggleCollapse(obj){setCollapsed(function(p){return p.indexOf(obj)>=0?p.filter(function(x){return x!==obj;}):p.concat([obj]);});}
+  function toggle(id){setSel(function(p){return p.indexOf(id)>=0?p.filter(function(x){return x!==id;}):p.concat([id]);});}
+  function toggleGrp(items){
+    var ids=items.map(function(i){return i.id;});
+    var allIn=ids.every(function(id){return sel.indexOf(id)>=0;});
+    if(allIn){setSel(function(p){return p.filter(function(id){return ids.indexOf(id)<0;});});}
+    else{setSel(function(p){var r=p.slice();ids.forEach(function(id){if(r.indexOf(id)<0)r.push(id);});return r;});}
+  }
+
+  var filteredGroups=NOTIF_GROUPS.filter(function(g){return !objF||g.object.toLowerCase().indexOf(objF.toLowerCase())>=0;}).map(function(g){
+    return {object:g.object,items:g.items.filter(function(i){return(!idF||String(i.id).indexOf(idF)>=0)&&(!nameF||i.name.toLowerCase().indexOf(nameF.toLowerCase())>=0)&&(!appF||i.application.toLowerCase().indexOf(appF.toLowerCase())>=0);})};
+  }).filter(function(g){return g.items.length>0;});
+
+  var total=filteredGroups.reduce(function(s,g){return s+g.items.length;},0);
+  var allIds=[];filteredGroups.forEach(function(g){g.items.forEach(function(i){allIds.push(i.id);});});
+  var allChk=allIds.length>0&&allIds.every(function(id){return sel.indexOf(id)>=0;});
+  var totalAll=NOTIF_GROUPS.reduce(function(s,g){return s+g.items.length;},0);
+
+  var rows=[];
+  filteredGroups.forEach(function(g){
+    var isCollapsed=collapsed.indexOf(g.object)>=0;
+    var allGrpSel=g.items.every(function(i){return sel.indexOf(i.id)>=0;});
+    rows.push(h(GrpHdr,{key:'grp-'+g.object,checked:allGrpSel,onCheck:function(){toggleGrp(g.items);},colSpan:5,isCollapsed:isCollapsed,onToggle:function(){toggleCollapse(g.object);},prefix:'Object',name:g.object,count:'('+g.items.length+')'}));
+    if(!isCollapsed){
+      g.items.forEach(function(i){
+        var isSel=sel.indexOf(i.id)>=0;
+        rows.push(h('tr',{key:i.id,onClick:function(){toggle(i.id);},style:{cursor:'pointer',background:isSel?C.accent:'transparent'}},
+          h('td',{style:Object.assign({},TD,{width:32,paddingLeft:20}),onClick:function(e){e.stopPropagation();}},h('input',{type:'checkbox',checked:isSel,onChange:function(){toggle(i.id);},style:{accentColor:C.brand}})),
+          h('td',{style:Object.assign({},TD,{width:28,paddingLeft:20})},h(Ic,{name:'Pencil',size:11,color:C.brand})),
+          h('td',{style:Object.assign({},TD,{color:C.brand,fontSize:12})},i.application),
+          h('td',{style:Object.assign({},TD,{color:C.brand,fontSize:12})},g.object),
+          h('td',{style:Object.assign({},TD,{color:C.brand,fontSize:12})},i.id),
+          h('td',{style:Object.assign({},TD,{fontSize:12})},i.name)
+        ));
+      });
+    }
+  });
+
+  return h(ModalShell,{title:'Select notification template(s) to include into the package',width:960,onClose:props.onClose,
+    footerLeft:'1 - '+total+' of '+totalAll,
+    footerRight:[h(MBtn,{key:'c',onClick:props.onClose},'Cancel'),h(MBtn,{key:'s',primary:true,disabled:sel.length===0,onClick:function(){
+      var items=[];filteredGroups.forEach(function(g){g.items.forEach(function(i){if(sel.indexOf(i.id)>=0)items.push(i);});});
+      props.onSelect(items);
+    }},'Select')]},
+    h('table',{style:{width:'100%',borderCollapse:'collapse'}},
+      h('thead',{style:{position:'sticky',top:0,zIndex:1}},
+        h('tr',null,
+          h('th',{style:Object.assign({},TH,{width:32})},h('input',{type:'checkbox',checked:allChk,onChange:function(){if(allChk)setSel([]);else setSel(allIds.slice());},style:{accentColor:C.brand}})),
+          h('th',{style:Object.assign({},TH,{width:28})}),
+          h('th',{style:TH},'Application'),h('th',{style:TH},'Object'),h('th',{style:TH},'Template #'),h('th',{style:TH},'Name')
         ),
-        React.createElement('tr',{style:{background:C.surface}},
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}}),
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}}),
-          ['application','object','name'].map(k=>React.createElement('th',{key:k,style:{...th,background:C.surface,padding:'3px 10px'}},React.createElement('input',{value:f[k],onChange:e=>upd(k,e.target.value),style:fi,placeholder:'filter…'}))),
-          React.createElement('th',{style:{...th,background:C.surface,padding:'3px 10px'}},
-            React.createElement('select',{value:f.type,onChange:e=>upd('type',e.target.value),style:fi},
-              React.createElement('option',{value:''},'All'),
-              ['Detail','Inventory'].map(o=>React.createElement('option',{key:o},o))
-            )
-          )
+        h('tr',{style:{background:C.surface}},
+          h('th',{style:THS}),h('th',{style:THS}),
+          h('th',{style:THS},filterInput(appF,setAppF)),
+          h('th',{style:THS},filterInput(objF,setObjF)),
+          h('th',{style:THS},filterInput(idF,setIdF)),
+          h('th',{style:THS},filterInput(nameF,setNameF))
         )
       ),
-      React.createElement('tbody',null,
-        filtered.map(v=>{
-          const isSel=sel.includes(v.name);
-          const isNonObj=v.object==='(empty)';
-          return React.createElement('tr',{key:v.name,onClick:()=>toggle(v.name),style:{cursor:'pointer',background:isSel?C.accent:isNonObj?'rgba(46,158,91,0.04)':'transparent'}},
-            React.createElement('td',{style:{...td,width:32},onClick:e=>e.stopPropagation()},React.createElement('input',{type:'checkbox',checked:isSel,onChange:()=>toggle(v.name),style:{accentColor:C.brand}})),
-            React.createElement('td',{style:{...td,width:28}},React.createElement(Ic,{name:'Pencil',size:11,color:C.brand})),
-            React.createElement('td',{style:{...td,color:v.application?C.brand:C.mutedFg,fontSize:12}},v.application||'—'),
-            React.createElement('td',{style:{...td,color:isNonObj?C.mutedFg:C.brand,fontSize:12,fontStyle:isNonObj?'italic':'normal'}},v.object),
-            React.createElement('td',{style:{...td,fontSize:12}},v.name),
-            React.createElement('td',{style:{...td,fontSize:12}},v.type)
-          );
-        })
-      )
+      h.apply(null,['tbody',null].concat(rows))
     )
   );
 }
 
-function Sidebar(){
-  const [search,setSearch]=useState('');
-  const filtered=NAV_ITEMS.filter(i=>i.label.toLowerCase().includes(search.toLowerCase()));
-  return React.createElement('aside',{style:{width:220,flexShrink:0,background:C.sidebarBg,color:C.sidebarFg,display:'flex',flexDirection:'column',height:'100%',overflow:'hidden'}},
-    React.createElement('div',{style:{padding:8,borderBottom:`1px solid ${C.sidebarAccent}`}},
-      React.createElement('div',{style:{display:'flex',alignItems:'center',gap:6,background:C.sidebarAccent,borderRadius:4,padding:'5px 8px'}},
-        React.createElement(Ic,{name:'Search',size:12,style:{opacity:0.6}}),
-        React.createElement('input',{value:search,onChange:e=>setSearch(e.target.value),placeholder:'Search',style:{background:'transparent',border:'none',outline:'none',color:C.sidebarFg,fontSize:12,width:'100%'}})
-      )
-    ),
-    React.createElement('nav',{style:{flex:1,overflowY:'auto',paddingTop:4}},
-      filtered.map(item=>
-        React.createElement('div',{key:item.label,style:{display:'flex',alignItems:'center',gap:8,padding:'6px 12px',cursor:'pointer',fontSize:12,background:item.active?C.sidebarActiveBg:'transparent',color:item.active?'#fff':C.sidebarFg,fontWeight:item.active?600:400}},
-          React.createElement(Ic,{name:item.icon,size:12,style:{flexShrink:0}}),
-          React.createElement('span',{style:{flex:1}},item.label),
-          item.badge&&React.createElement('span',{style:{background:C.brand,color:'#fff',fontSize:10,borderRadius:99,padding:'1px 6px'}},item.badge),
-          item.hasChildren&&React.createElement(Ic,{name:'ChevronRight',size:10,style:{opacity:0.5}})
+function ViewModal(props) {
+  var s1=useState('');var appF=s1[0];var setAppF=s1[1];
+  var s2=useState('');var objF=s2[0];var setObjF=s2[1];
+  var s3=useState('');var nameF=s3[0];var setNameF=s3[1];
+  var s4=useState('');var typeF=s4[0];var setTypeF=s4[1];
+  var s5=useState([]);var sel=s5[0];var setSel=s5[1];
+
+  var filtered=VIEW_DATA.filter(function(v){return v.application.toLowerCase().indexOf(appF.toLowerCase())>=0&&v.object.toLowerCase().indexOf(objF.toLowerCase())>=0&&v.name.toLowerCase().indexOf(nameF.toLowerCase())>=0&&(!typeF||v.type===typeF);});
+  function toggle(n){setSel(function(p){return p.indexOf(n)>=0?p.filter(function(x){return x!==n;}):p.concat([n]);});}
+  var allChk=sel.length===filtered.length&&filtered.length>0;
+
+  return h(ModalShell,{title:'Select the view(s) to include into the package',width:980,onClose:props.onClose,
+    footerLeft:'1 - '+filtered.length+' of '+VIEW_DATA.length,
+    footerRight:[h(MBtn,{key:'c',onClick:props.onClose},'Cancel'),h(MBtn,{key:'s',primary:true,disabled:sel.length===0,onClick:function(){props.onSelect(VIEW_DATA.filter(function(v){return sel.indexOf(v.name)>=0;}));}},'Select')]},
+    h('table',{style:{width:'100%',borderCollapse:'collapse'}},
+      h('thead',{style:{position:'sticky',top:0,zIndex:1}},
+        h('tr',null,
+          h('th',{style:Object.assign({},TH,{width:32})},h('input',{type:'checkbox',checked:allChk,onChange:function(){if(allChk)setSel([]);else setSel(filtered.map(function(v){return v.name;}));},style:{accentColor:C.brand}})),
+          h('th',{style:Object.assign({},TH,{width:28})}),
+          h('th',{style:TH},'Application'),h('th',{style:TH},'Object'),h('th',{style:TH},'Name'),h('th',{style:TH},'Type')
+        ),
+        h('tr',{style:{background:C.surface}},
+          h('th',{style:THS}),h('th',{style:THS}),
+          h('th',{style:THS},filterInput(appF,setAppF)),
+          h('th',{style:THS},filterInput(objF,setObjF)),
+          h('th',{style:THS},filterInput(nameF,setNameF)),
+          h('th',{style:THS},h('select',{value:typeF,onChange:function(e){setTypeF(e.target.value);},style:FI},h('option',{value:''},'All'),h('option',null,'Detail'),h('option',null,'Inventory')))
         )
-      )
+      ),
+      h('tbody',null,filtered.map(function(v){
+        var isSel=sel.indexOf(v.name)>=0;
+        var isNonObj=v.object==='(empty)';
+        return h('tr',{key:v.name,onClick:function(){toggle(v.name);},style:{cursor:'pointer',background:isSel?C.accent:'transparent'}},
+          h('td',{style:Object.assign({},TD,{width:32}),onClick:function(e){e.stopPropagation();}},h('input',{type:'checkbox',checked:isSel,onChange:function(){toggle(v.name);},style:{accentColor:C.brand}})),
+          h('td',{style:Object.assign({},TD,{width:28})},h(Ic,{name:'Pencil',size:11,color:C.brand})),
+          h('td',{style:Object.assign({},TD,{color:v.application?C.brand:C.mutedFg,fontSize:12})},v.application||'—'),
+          h('td',{style:Object.assign({},TD,{color:isNonObj?C.mutedFg:C.brand,fontSize:12,fontStyle:isNonObj?'italic':'normal'})},v.object),
+          h('td',{style:Object.assign({},TD,{color:C.brand,fontSize:12})},v.name),
+          h('td',{style:Object.assign({},TD,{fontSize:12})},v.type)
+        );
+      }))
     )
   );
 }
 
-function App(){
-  const [mode,setMode]=useState('before');
-  const [modal,setModal]=useState(null);
-  const [items,setItems]=useState([]);
-  const [selRows,setSelRows]=useState([]);
-  const [nextId,setNextId]=useState(1);
-  const pkg='New Package Designer Items Prototype';
+function App() {
+  var s1=useState('before');var mode=s1[0];var setMode=s1[1];
+  var s2=useState(null);var modal=s2[0];var setModal=s2[1];
+  var s3=useState([]);var items=s3[0];var setItems=s3[1];
+  var s4=useState([]);var selRows=s4[0];var setSelRows=s4[1];
+  var s5=useState(1);var nextId=s5[0];var setNextId=s5[1];
+  var pkg='New Package Designer Items Prototype';
 
-  const reset=m=>{setMode(m);setItems([]);setSelRows([]);};
-  const addItems=newItems=>{
-    const stamped=newItems.map((item,i)=>({...item,id:nextId+i}));
-    setNextId(n=>n+newItems.length);
-    setItems(p=>[...p,...stamped]);
-  };
-  const handleTypeSelect=type=>{
+  function reset(m){setMode(m);setItems([]);setSelRows([]);}
+  function addItems(newItems){
+    var nid=nextId;
+    var stamped=newItems.map(function(item,i){return Object.assign({},item,{id:nid+i});});
+    setNextId(nid+newItems.length);
+    setItems(function(p){return p.concat(stamped);});
+  }
+  function handleTypeSelect(type){
     setModal(null);
-    if(type==='Object Action Handler') setModal('actionHandler');
-    else if(type==='Application Tab') setModal('appTab');
-    else if(type==='Notification Template') setModal('notifTemplate');
-    else if(type==='View') setModal('view');
-    else addItems([{caption:`New ${type}`,type,topLevelItem:'',ifExists:'',ifDoesNotExist:''}]);
-  };
-  const toggleRow=id=>setSelRows(p=>p.includes(id)?p.filter(r=>r!==id):[...p,id]);
-  const toggleAll=()=>setSelRows(selRows.length===items.length?[]:items.map(i=>i.id));
-  const handleRemove=()=>{setItems(p=>p.filter(i=>!selRows.includes(i.id)));setSelRows([]);};
+    if(type==='Object Action Handler')setModal('actionHandler');
+    else if(type==='Application Tab')setModal('appTab');
+    else if(type==='Notification Template')setModal('notifTemplate');
+    else if(type==='View')setModal('view');
+    else addItems([{caption:'New '+type,type:type,topLevelItem:'',ifExists:'',ifDoesNotExist:''}]);
+  }
+  function toggleRow(id){setSelRows(function(p){return p.indexOf(id)>=0?p.filter(function(r){return r!==id;}):p.concat([id]);});}
+  function toggleAll(){setSelRows(selRows.length===items.length?[]:items.map(function(i){return i.id;}));}
+  function handleRemove(){setItems(function(p){return p.filter(function(i){return selRows.indexOf(i.id)<0;});});setSelRows([]);}
 
-  const actionBar=[{icon:'Pencil',label:'Edit',p:true},{icon:'RefreshCw',label:'Refresh'},{icon:'Upload',label:'Publish'},{icon:'Trash2',label:'Delete'},{icon:'LogOut',label:'Exit'}];
-
-  return React.createElement('div',{style:{display:'flex',height:'100vh',overflow:'hidden',background:C.bg}},
-    React.createElement(Sidebar),
-    React.createElement('div',{style:{flex:1,display:'flex',flexDirection:'column',overflow:'hidden'}},
-      // Top nav
-      React.createElement('div',{style:{background:C.brand,color:'#fff',display:'flex',borderBottom:`1px solid ${C.brandDark}`}},
-        ['System Administration','Application Configuration'].map((t,i)=>
-          React.createElement('button',{key:t,style:{padding:'8px 18px',fontSize:13,fontWeight:i===0?600:400,background:'none',border:'none',borderRight:`1px solid ${C.brandDark}`,color:'#fff',cursor:'pointer'}},t)
-        )
+  return h('div',{style:{display:'flex',height:'100vh',overflow:'hidden',background:C.bg,fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif",fontSize:13,color:C.foreground}},
+    h(Sidebar),
+    h('div',{style:{flex:1,display:'flex',flexDirection:'column',overflow:'hidden'}},
+      h('div',{style:{background:C.brand,color:'#fff',display:'flex',borderBottom:'1px solid '+C.brandDark}},
+        h('button',{style:{padding:'8px 18px',fontSize:13,fontWeight:600,background:'none',border:'none',borderRight:'1px solid '+C.brandDark,color:'#fff',cursor:'pointer'}},'System Administration'),
+        h('button',{style:{padding:'8px 18px',fontSize:13,fontWeight:400,background:'none',border:'none',color:'#fff',cursor:'pointer'}},'Application Configuration')
       ),
-      // Breadcrumb
-      React.createElement('div',{style:{padding:'5px 18px',background:C.surface,borderBottom:`1px solid ${C.border}`,fontSize:11,color:C.brand,display:'flex',alignItems:'center',gap:4}},
-        ['Home','System Administration','Package Designer'].map((s,i)=>
-          React.createElement('span',{key:s,style:{display:'flex',alignItems:'center',gap:4}},
-            i>0&&React.createElement(Ic,{name:'ChevronRight',size:10}),s
+      h('div',{style:{padding:'5px 18px',background:C.surface,borderBottom:'1px solid '+C.border,fontSize:11,color:C.brand,display:'flex',alignItems:'center',gap:4}},
+        h('span',null,'Home'),h(Ic,{name:'ChevronRight',size:10}),
+        h('span',null,'System Administration'),h(Ic,{name:'ChevronRight',size:10}),
+        h('span',null,'Package Designer'),h(Ic,{name:'ChevronRight',size:10}),
+        h('span',{style:{color:C.foreground,fontWeight:600}},pkg)
+      ),
+      h('div',{style:{padding:'5px 18px',background:C.surface,borderBottom:'1px solid '+C.border,display:'flex',alignItems:'center',gap:16,fontSize:12}},
+        h('button',{style:{display:'flex',alignItems:'center',gap:5,background:'none',border:'none',cursor:'pointer',color:C.brand,fontWeight:600,fontSize:12}},h(Ic,{name:'Pencil',size:12}),'Edit'),
+        h('button',{style:{display:'flex',alignItems:'center',gap:5,background:'none',border:'none',cursor:'pointer',color:C.mutedFg,fontSize:12}},h(Ic,{name:'RefreshCw',size:12}),'Refresh'),
+        h('button',{style:{display:'flex',alignItems:'center',gap:5,background:'none',border:'none',cursor:'pointer',color:C.mutedFg,fontSize:12}},h(Ic,{name:'Upload',size:12}),'Publish'),
+        h('button',{style:{display:'flex',alignItems:'center',gap:5,background:'none',border:'none',cursor:'pointer',color:C.mutedFg,fontSize:12}},h(Ic,{name:'Trash2',size:12}),'Delete'),
+        h('button',{style:{display:'flex',alignItems:'center',gap:5,background:'none',border:'none',cursor:'pointer',color:C.mutedFg,fontSize:12}},h(Ic,{name:'LogOut',size:12}),'Exit')
+      ),
+      h('div',{style:{flex:1,overflowY:'auto',padding:18,display:'flex',flexDirection:'column',gap:14,minHeight:0}},
+        h('div',{style:{display:'flex',borderRadius:6,overflow:'hidden',border:'1px solid '+C.border,boxShadow:'0 1px 4px rgba(0,0,0,0.07)'}},
+          h('button',{onClick:function(){reset('before');},style:{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8,padding:'10px 16px',fontSize:13,fontWeight:600,cursor:'pointer',border:'none',background:mode==='before'?C.destructive:C.surface,color:mode==='before'?'#fff':C.foreground}},h(Ic,{name:'AlertTriangle',size:14}),' Current State (Problem)'),
+          h('div',{style:{width:1,background:C.border}}),
+          h('button',{onClick:function(){reset('after');},style:{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8,padding:'10px 16px',fontSize:13,fontWeight:600,cursor:'pointer',border:'none',background:mode==='after'?C.success:C.surface,color:mode==='after'?'#fff':C.foreground}},h(Ic,{name:'CheckCircle2',size:14}),' Proposed Solution (Fixed)')
+        ),
+        mode==='before'?h('div',{style:{display:'flex',gap:10,background:'rgba(214,59,59,0.07)',border:'1px solid rgba(214,59,59,0.3)',borderRadius:5,padding:'10px 14px'}},
+          h(Ic,{name:'AlertTriangle',size:15,color:C.destructive,style:{marginTop:1,flexShrink:0}}),
+          h('div',null,
+            h('p',{style:{fontWeight:700,color:C.destructive,fontSize:13,margin:'0 0 3px'}},'Customer Problem'),
+            h('p',{style:{fontSize:12,color:C.foreground,margin:0,lineHeight:1.55}},'Users cannot include ',h('strong',null,'Object Action Handler'),', ',h('strong',null,'Application Tabs'),', or ',h('strong',null,'Notification Templates'),' in a PIE package. The ',h('strong',null,'View'),' picker also lacks non-object bound views. Click ',h('strong',null,'Add Item'),' to see the limitations.')
+          )
+        ):null,
+        h('h1',{style:{fontSize:22,fontWeight:700,margin:0}},pkg),
+        h('div',{style:{background:C.surface,borderRadius:5,border:'1px solid '+C.border,padding:16}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:14,paddingBottom:10,borderBottom:'1px solid '+C.border}},
+            h('div',{style:{width:22,height:22,borderRadius:4,background:C.brand,color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700}},'P'),
+            h('span',{style:{fontWeight:600,fontSize:14}},'Package Details')
+          ),
+          h('div',{style:{display:'grid',gridTemplateColumns:'140px 1fr',gap:'6px 0',maxWidth:360,fontSize:13}},
+            h('span',{style:{fontWeight:600,textAlign:'right',paddingRight:16}},'Package Name'),h('span',null,pkg),
+            h('span',{style:{fontWeight:600,textAlign:'right',paddingRight:16}},'Description'),h('span',{style:{color:C.mutedFg,fontStyle:'italic'}},'—')
           )
         ),
-        React.createElement(Ic,{name:'ChevronRight',size:10}),
-        React.createElement('span',{style:{color:C.foreground,fontWeight:600}},pkg)
-      ),
-      // Action bar
-      React.createElement('div',{style:{padding:'5px 18px',background:C.surface,borderBottom:`1px solid ${C.border}`,display:'flex',alignItems:'center',gap:16,fontSize:12}},
-        actionBar.map(({icon,label,p})=>
-          React.createElement('button',{key:label,style:{display:'flex',alignItems:'center',gap:5,background:'none',border:'none',cursor:'pointer',color:p?C.brand:C.mutedFg,fontWeight:p?600:400,fontSize:12}},
-            React.createElement(Ic,{name:icon,size:12}),label
-          )
-        )
-      ),
-      // Content
-      React.createElement('div',{style:{flex:1,overflowY:'auto',padding:18,display:'flex',flexDirection:'column',gap:14,minHeight:0}},
-        // Toggle
-        React.createElement('div',{style:{display:'flex',borderRadius:6,overflow:'hidden',border:`1px solid ${C.border}`,boxShadow:'0 1px 4px rgba(0,0,0,0.07)'}},
-          React.createElement('button',{onClick:()=>reset('before'),style:{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8,padding:'10px 16px',fontSize:13,fontWeight:600,cursor:'pointer',border:'none',background:mode==='before'?C.destructive:C.surface,color:mode==='before'?'#fff':C.foreground}},
-            React.createElement(Ic,{name:'AlertTriangle',size:14}),' Current State (Problem)'
+        h('div',{style:{background:C.surface,borderRadius:5,border:'1px solid '+C.border,overflow:'hidden',display:'flex',flexDirection:'column',minHeight:0}},
+          h('div',{style:{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',borderBottom:'1px solid '+C.border}},
+            h('div',{style:{width:22,height:22,borderRadius:4,background:C.brand,color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700}},'I'),
+            h('span',{style:{fontWeight:600,fontSize:14}},'Included items')
           ),
-          React.createElement('div',{style:{width:1,background:C.border}}),
-          React.createElement('button',{onClick:()=>reset('after'),style:{flex:1,display:'flex',alignItems:'center',justifyContent:'center',gap:8,padding:'10px 16px',fontSize:13,fontWeight:600,cursor:'pointer',border:'none',background:mode==='after'?C.success:C.surface,color:mode==='after'?'#fff':C.foreground}},
-            React.createElement(Ic,{name:'CheckCircle2',size:14}),' Proposed Solution (Fixed)'
-          )
-        ),
-        // Banner
-        mode==='before'
-          ? React.createElement('div',{style:{display:'flex',gap:10,background:'rgba(214,59,59,0.07)',border:'1px solid rgba(214,59,59,0.3)',borderRadius:5,padding:'10px 14px'}},
-              React.createElement(Ic,{name:'AlertTriangle',size:15,color:C.destructive,style:{marginTop:1,flexShrink:0}}),
-              React.createElement('div',null,
-                React.createElement('p',{style:{fontWeight:700,color:C.destructive,fontSize:13,margin:'0 0 3px'}},'Customer Problem'),
-                React.createElement('p',{style:{fontSize:12,color:C.foreground,margin:0,lineHeight:1.55}},
-                  'Users cannot include ',React.createElement('strong',null,'Object Action Handler'),', ',React.createElement('strong',null,'Application Tabs'),', or ',React.createElement('strong',null,'Notification Templates'),' in a PIE package. The ',React.createElement('strong',null,'View'),' picker also lacks non-object bound views. Click ',React.createElement('strong',null,'Add Item'),' to see the limitations.'
-                )
-              )
-            )
-          : React.createElement('div',{style:{display:'flex',gap:10,background:'rgba(46,158,91,0.08)',border:'1px solid rgba(46,158,91,0.3)',borderRadius:5,padding:'10px 14px'}},
-              React.createElement(Ic,{name:'CheckCircle2',size:15,color:C.success,style:{marginTop:1,flexShrink:0}}),
-              React.createElement('div',null,
-                React.createElement('p',{style:{fontWeight:700,color:C.success,fontSize:13,margin:'0 0 3px'}},'Proposed Solution'),
-                React.createElement('p',{style:{fontSize:12,color:C.foreground,margin:0,lineHeight:1.55}},
-                  '3 new types added: ',React.createElement('strong',null,'Object Action Handler'),', ',React.createElement('strong',null,'Application Tab'),', ',React.createElement('strong',null,'Notification Template'),'. The ',React.createElement('strong',null,'View'),' picker now includes non-object bound views. Click ',React.createElement('strong',null,'Add Item'),' to walk through any flow.'
-                )
-              )
-            ),
-        React.createElement('h1',{style:{fontSize:22,fontWeight:700,margin:0}},pkg),
-        // Package Details
-        React.createElement('div',{style:{background:C.surface,borderRadius:5,border:`1px solid ${C.border}`,padding:16}},
-          React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,marginBottom:14,paddingBottom:10,borderBottom:`1px solid ${C.border}`}},
-            React.createElement('div',{style:{width:22,height:22,borderRadius:4,background:C.brand,color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700}},'P'),
-            React.createElement('span',{style:{fontWeight:600,fontSize:14}},'Package Details')
+          h('div',{style:{display:'flex',alignItems:'center',gap:6,padding:'7px 14px',borderBottom:'1px solid '+C.border,background:C.muted}},
+            h('button',{onClick:function(){setModal('type');},style:{display:'flex',alignItems:'center',gap:5,background:C.warning,color:C.warningFg,border:'none',borderRadius:4,padding:'5px 12px',fontSize:12,fontWeight:700,cursor:'pointer'}},h(Ic,{name:'Plus',size:12}),' Add Item'),
+            h('button',{onClick:handleRemove,disabled:selRows.length===0,style:{display:'flex',alignItems:'center',gap:5,background:'none',border:'none',fontSize:12,color:selRows.length===0?C.mutedFg:C.brand,cursor:selRows.length===0?'not-allowed':'pointer',opacity:selRows.length===0?0.4:1}},h(Ic,{name:'Minus',size:12}),' Remove'),
+            h('button',{style:{display:'flex',alignItems:'center',gap:5,background:'none',border:'none',fontSize:12,color:C.brand,cursor:'pointer'}},h(Ic,{name:'List',size:12}),' List All'),
+            h('button',{style:{display:'flex',alignItems:'center',gap:5,background:'none',border:'none',fontSize:12,color:C.mutedFg,cursor:'pointer'}},h(Ic,{name:'Settings2',size:12}),' Actions')
           ),
-          React.createElement('div',{style:{display:'grid',gridTemplateColumns:'140px 1fr',gap:'6px 0',maxWidth:360,fontSize:13}},
-            React.createElement('span',{style:{fontWeight:600,textAlign:'right',paddingRight:16}},'Package Name'),React.createElement('span',null,pkg),
-            React.createElement('span',{style:{fontWeight:600,textAlign:'right',paddingRight:16}},'Description'),React.createElement('span',{style:{color:C.mutedFg,fontStyle:'italic'}},'—')
-          )
-        ),
-        // Included Items
-        React.createElement('div',{style:{background:C.surface,borderRadius:5,border:`1px solid ${C.border}`,overflow:'hidden',display:'flex',flexDirection:'column',minHeight:0}},
-          React.createElement('div',{style:{display:'flex',alignItems:'center',gap:8,padding:'10px 14px',borderBottom:`1px solid ${C.border}`}},
-            React.createElement('div',{style:{width:22,height:22,borderRadius:4,background:C.brand,color:'#fff',display:'flex',alignItems:'center',justifyContent:'center',fontSize:11,fontWeight:700}},'I'),
-            React.createElement('span',{style:{fontWeight:600,fontSize:14}},'Included items')
-          ),
-          React.createElement('div',{style:{display:'flex',alignItems:'center',gap:6,padding:'7px 14px',borderBottom:`1px solid ${C.border}`,background:C.muted}},
-            React.createElement('button',{onClick:()=>setModal('type'),style:{display:'flex',alignItems:'center',gap:5,background:C.warning,color:C.warningFg,border:'none',borderRadius:4,padding:'5px 12px',fontSize:12,fontWeight:700,cursor:'pointer'}},
-              React.createElement(Ic,{name:'Plus',size:12}),' Add Item'
-            ),
-            React.createElement('button',{onClick:handleRemove,disabled:selRows.length===0,style:{display:'flex',alignItems:'center',gap:5,background:'none',border:'none',fontSize:12,color:selRows.length===0?C.mutedFg:C.brand,cursor:selRows.length===0?'not-allowed':'pointer',opacity:selRows.length===0?0.4:1}},
-              React.createElement(Ic,{name:'Minus',size:12}),' Remove'
-            ),
-            React.createElement('button',{style:{display:'flex',alignItems:'center',gap:5,background:'none',border:'none',fontSize:12,color:C.brand,cursor:'pointer'}},React.createElement(Ic,{name:'List',size:12}),' List All'),
-            React.createElement('button',{style:{display:'flex',alignItems:'center',gap:5,background:'none',border:'none',fontSize:12,color:C.mutedFg,cursor:'pointer'}},React.createElement(Ic,{name:'Settings2',size:12}),' Actions')
-          ),
-          React.createElement('div',{style:{overflowY:'auto',maxHeight:320}},
-            React.createElement('table',{style:{width:'100%',borderCollapse:'collapse'}},
-              React.createElement('thead',null,
-                React.createElement('tr',null,
-                  React.createElement('th',{style:{...th,width:32}},React.createElement('input',{type:'checkbox',checked:items.length>0&&selRows.length===items.length,onChange:toggleAll,style:{accentColor:C.brand}})),
-                  React.createElement('th',{style:{...th,width:28}}),
-                  ['Caption ↑','Type ↑','Top Level Item ↑','If Exists ↑','If Does Not Exist ↑'].map(h=>React.createElement('th',{key:h,style:th},h))
+          h('div',{style:{overflowY:'auto',maxHeight:320}},
+            h('table',{style:{width:'100%',borderCollapse:'collapse'}},
+              h('thead',null,
+                h('tr',null,
+                  h('th',{style:Object.assign({},TH,{width:32})},h('input',{type:'checkbox',checked:items.length>0&&selRows.length===items.length,onChange:toggleAll,style:{accentColor:C.brand}})),
+                  h('th',{style:Object.assign({},TH,{width:28})}),
+                  h('th',{style:TH},'Caption'),h('th',{style:TH},'Type'),h('th',{style:TH},'Top Level Item'),h('th',{style:TH},'If Exists'),h('th',{style:TH},'If Does Not Exist')
                 ),
-                React.createElement('tr',{style:{background:C.surface}},
-                  [...Array(7)].map((_,i)=>React.createElement('th',{key:i,style:{...th,background:C.surface,padding:'3px 10px'}},i>1&&React.createElement('input',{style:fi})))
+                h('tr',{style:{background:C.surface}},
+                  h('th',{style:THS}),h('th',{style:THS}),
+                  h('th',{style:THS},h('input',{style:FI})),h('th',{style:THS},h('input',{style:FI})),
+                  h('th',{style:THS},h('input',{style:FI})),h('th',{style:THS},h('input',{style:FI})),h('th',{style:THS},h('input',{style:FI}))
                 )
               ),
-              React.createElement('tbody',null,
-                items.length===0
-                  ? React.createElement('tr',null,React.createElement('td',{colSpan:7,style:{textAlign:'center',padding:48,color:C.mutedFg}},
-                      React.createElement('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:8}},
-                        React.createElement(Ic,{name:'List',size:40,color:C.brand,style:{opacity:0.25}}),
-                        React.createElement('span',{style:{color:C.brand,fontSize:13}},'No records')
-                      )
-                    ))
-                  : items.map(item=>{
-                      const isSel=selRows.includes(item.id);
-                      return React.createElement('tr',{key:item.id,onClick:()=>toggleRow(item.id),style:{cursor:'pointer',background:isSel?C.accent:'transparent'}},
-                        React.createElement('td',{style:{...td,width:32},onClick:e=>e.stopPropagation()},React.createElement('input',{type:'checkbox',checked:isSel,onChange:()=>toggleRow(item.id),style:{accentColor:C.brand}})),
-                        React.createElement('td',{style:{...td,width:28}},React.createElement(Ic,{name:'Pencil',size:11,color:C.brand})),
-                        React.createElement('td',{style:{...td,color:C.brand,fontWeight:500}},item.caption),
-                        React.createElement('td',{style:{...td,fontSize:12}},item.type),
-                        React.createElement('td',{style:{...td,fontSize:12}},item.topLevelItem),
-                        React.createElement('td',{style:{...td,color:C.brand,fontSize:12}},item.ifExists),
-                        React.createElement('td',{style:{...td,color:C.brand,fontSize:12}},item.ifDoesNotExist)
-                      );
-                    })
+              h('tbody',null,
+                items.length===0?h('tr',null,h('td',{colSpan:7,style:{textAlign:'center',padding:48,color:C.mutedFg}},
+                  h('div',{style:{display:'flex',flexDirection:'column',alignItems:'center',gap:8}},
+                    h(Ic,{name:'List',size:40,color:C.brand,style:{opacity:0.25}}),
+                    h('span',{style:{color:C.brand,fontSize:13}},'No records')
+                  )
+                )):
+                items.map(function(item){
+                  var isSel=selRows.indexOf(item.id)>=0;
+                  return h('tr',{key:item.id,onClick:function(){toggleRow(item.id);},style:{cursor:'pointer',background:isSel?C.accent:'transparent'}},
+                    h('td',{style:Object.assign({},TD,{width:32}),onClick:function(e){e.stopPropagation();}},h('input',{type:'checkbox',checked:isSel,onChange:function(){toggleRow(item.id);},style:{accentColor:C.brand}})),
+                    h('td',{style:Object.assign({},TD,{width:28})},h(Ic,{name:'Pencil',size:11,color:C.brand})),
+                    h('td',{style:Object.assign({},TD,{color:C.brand,fontWeight:500})},item.caption),
+                    h('td',{style:Object.assign({},TD,{fontSize:12})},item.type),
+                    h('td',{style:Object.assign({},TD,{fontSize:12})},item.topLevelItem),
+                    h('td',{style:Object.assign({},TD,{color:C.brand,fontSize:12})},item.ifExists),
+                    h('td',{style:Object.assign({},TD,{color:C.brand,fontSize:12})},item.ifDoesNotExist)
+                  );
+                })
               )
             )
           ),
-          React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'6px 14px',borderTop:`1px solid ${C.border}`,background:C.muted,fontSize:11,color:C.mutedFg}},
-            React.createElement('span',{style:{color:items.length===0?C.warning:C.mutedFg}},items.length===0?'No records to display.':`1 – ${items.length} of ${items.length}`),
-            React.createElement('div',{style:{display:'flex',alignItems:'center',gap:4}},'Items Displayed',
-              React.createElement('select',{style:{border:`1px solid ${C.border}`,borderRadius:3,padding:'1px 4px',marginLeft:4,background:C.surface,fontSize:11}},
-                React.createElement('option',null,'20'),React.createElement('option',null,'50')
-              )
+          h('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'6px 14px',borderTop:'1px solid '+C.border,background:C.muted,fontSize:11,color:C.mutedFg}},
+            h('span',{style:{color:items.length===0?C.warning:C.mutedFg}},items.length===0?'No records to display.':'1 - '+items.length+' of '+items.length),
+            h('div',{style:{display:'flex',alignItems:'center',gap:4}},'Items Displayed',
+              h('select',{style:{border:'1px solid '+C.border,borderRadius:3,padding:'1px 4px',marginLeft:4,background:C.surface,fontSize:11}},h('option',null,'20'),h('option',null,'50'))
             )
-          )
-        ),
-        // Note
-        React.createElement('div',{style:{display:'flex',gap:8,background:C.accent,border:`1px solid ${C.border}`,borderRadius:5,padding:'10px 14px',fontSize:12,color:C.accentFg}},
-          React.createElement(Ic,{name:'Info',size:13,style:{marginTop:1,flexShrink:0}}),
-          React.createElement('p',{style:{margin:0,lineHeight:1.55}},
-            React.createElement('strong',null,'Prototype Note:'),' Toggle between states above. In ',React.createElement('strong',null,'Proposed Solution'),' mode, ',React.createElement('strong',null,'Add Item'),' exposes 3 new types (Object Action Handler, Application Tab, Notification Template) plus an upgraded View picker with non-object bound views.'
           )
         )
       )
     ),
-    modal==='type'&&React.createElement(ItemTypeModal,{mode,onSelect:handleTypeSelect,onClose:()=>setModal(null)}),
-    modal==='actionHandler'&&React.createElement(ActionHandlerModal,{onClose:()=>setModal(null),onSelect:handlers=>{addItems(handlers.map(h=>({caption:h.name,type:'Object Action Handler',topLevelItem:'Yes',ifExists:'Synchronize',ifDoesNotExist:'Synchronize'})));setModal(null);}}),
-    modal==='appTab'&&React.createElement(ApplicationTabModal,{onClose:()=>setModal(null),onSelect:tabs=>{addItems(tabs.map(t=>({caption:t.caption,type:'Application Tab',topLevelItem:'Yes',ifExists:'Synchronize',ifDoesNotExist:'Synchronize'})));setModal(null);}}),
-    modal==='notifTemplate'&&React.createElement(NotificationTemplateModal,{onClose:()=>setModal(null),onSelect:templates=>{addItems(templates.map(t=>({caption:t.name,type:'Notification Template',topLevelItem:'Yes',ifExists:'Synchronize',ifDoesNotExist:'Synchronize'})));setModal(null);}}),
-    modal==='view'&&React.createElement(ViewModal,{onClose:()=>setModal(null),onSelect:views=>{addItems(views.map(v=>({caption:v.name,type:'View',topLevelItem:'Yes',ifExists:'Synchronize',ifDoesNotExist:'Synchronize'})));setModal(null);}})
+    modal==='type'?h(ItemTypeModal,{mode:mode,onSelect:handleTypeSelect,onClose:function(){setModal(null);}}):null,
+    modal==='actionHandler'?h(ActionHandlerModal,{onClose:function(){setModal(null);},onSelect:function(handlers){addItems(handlers.map(function(hh){return{caption:hh.name,type:'Object Action Handler',topLevelItem:'Yes',ifExists:'Synchronize',ifDoesNotExist:'Synchronize'};}));setModal(null);}}):null,
+    modal==='appTab'?h(ApplicationTabModal,{onClose:function(){setModal(null);},onSelect:function(tabs){addItems(tabs.map(function(t){return{caption:t.caption,type:'Application Tab',topLevelItem:'Yes',ifExists:'Synchronize',ifDoesNotExist:'Synchronize'};}));setModal(null);}}):null,
+    modal==='notifTemplate'?h(NotificationTemplateModal,{onClose:function(){setModal(null);},onSelect:function(templates){addItems(templates.map(function(t){return{caption:t.name,type:'Notification Template',topLevelItem:'Yes',ifExists:'Synchronize',ifDoesNotExist:'Synchronize'};}));setModal(null);}}):null,
+    modal==='view'?h(ViewModal,{onClose:function(){setModal(null);},onSelect:function(views){addItems(views.map(function(v){return{caption:v.name,type:'View',topLevelItem:'Yes',ifExists:'Synchronize',ifDoesNotExist:'Synchronize'};}));setModal(null);}}):null
   );
 }
 
-ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+ReactDOM.createRoot(document.getElementById('root')).render(h(App));
 </script>
 </body>
 </html>
